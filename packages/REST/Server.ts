@@ -18,7 +18,7 @@ export class ServerContainer {
     },
     getTargetClass: (serviceClass: Function) => {
       return <FunctionConstructor>serviceClass;
-    }
+    },
   };
 
   static authorizationMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +26,7 @@ export class ServerContainer {
   };
 
   static registerServiceClass(target: Function): ServiceClass {
-    const name: string = target["name"] || target.constructor["name"];
+    const name: string = target['name'] || target.constructor['name'];
     target = ServerContainer.serviceFactory.getTargetClass(target);
 
     if (!ServerContainer.serverClasses.has(name)) {
@@ -46,10 +46,10 @@ export class ServerContainer {
 
   buildServices(types: Array<Function>) {
     if (types) {
-      types = types.map(type => ServerContainer.serviceFactory.getTargetClass(type));
+      types = types.map((type) => ServerContainer.serviceFactory.getTargetClass(type));
     }
-    ServerContainer.serverClasses.forEach(classData => {
-      classData.methods.forEach(method => {
+    ServerContainer.serverClasses.forEach((classData) => {
+      classData.methods.forEach((method) => {
         if (this.validateTargetType(classData.targetClass, types)) {
           this.buildService(classData, method);
         }
@@ -70,7 +70,7 @@ export class ServerContainer {
 
   async buildService(serviceClass: ServiceClass, serviceMethod: ServiceMethod) {
     const serviceObject = this.createService(serviceClass);
-    const paths = [this.rootPrefix, serviceClass.path ?? '', serviceMethod.path ?? '']
+    const paths = [this.rootPrefix, serviceClass.path ?? '', serviceMethod.path ?? ''];
     const path = pathResolver(paths);
     serviceMethod.resolvedPath = path;
 
@@ -82,11 +82,10 @@ export class ServerContainer {
         const response = await serviceObject[serviceMethod.name](...args);
 
         this._sendComplexValue(res, response);
-
       } catch (error) {
-        next(error)
+        next(error);
       }
-    }
+    };
 
     this._registerRoute(serviceMethod, handler);
   }
@@ -106,9 +105,9 @@ export class ServerContainer {
       const fileName = value.fileName;
 
       response.writeHead(200, {
-        "Content-Length": content.length,
-        "Content-Type": "application/pdf",
-        'Content-disposition': `attachment;filename="${fileName}"`
+        'Content-Length': content.length,
+        'Content-Type': 'application/pdf',
+        'Content-disposition': `attachment;filename="${fileName}"`,
       });
 
       response.end(content);
@@ -149,7 +148,7 @@ export class ServerContainer {
           parameters.push(context);
           break;
         default:
-          throw new Error("HttpVerb is not supported!.");
+          throw new Error('HttpVerb is not supported!.');
       }
     });
     return parameters;
@@ -178,10 +177,9 @@ export class ServerContainer {
         return this.router.delete(serviceMethod.resolvedPath, [...args]);
 
       default:
-        throw new Error("HttpMethod is not supported!.");
+        throw new Error('HttpMethod is not supported!.');
     }
   }
-
 
   private createService(serviceClass: ServiceClass) {
     const serviceObject = ServerContainer.serviceFactory.create(serviceClass.targetClass);
@@ -190,7 +188,7 @@ export class ServerContainer {
 
   private validateTargetType(targetClass: Function, types: Array<Function>): boolean {
     if (types && types.length > 0) {
-      return (types.indexOf(targetClass) > -1);
+      return types.indexOf(targetClass) > -1;
     }
     return true;
   }
@@ -200,13 +198,12 @@ export class ServerContainer {
       res.writeHead(200, {
         'Content-Length': value.content.length,
         'Content-Type': value.mimeType,
-        'Content-disposition': 'attachment;filename=' + value.fileName
+        'Content-disposition': 'attachment;filename=' + value.fileName,
       });
-    }
-    else {
+    } else {
       res.writeHead(200, {
         'Content-Length': value.content.length,
-        'Content-Type': value.mimeType
+        'Content-Type': value.mimeType,
       });
     }
     res.end(value.content);
