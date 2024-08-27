@@ -8,7 +8,7 @@ export interface EventService {
   getAll: () => Promise<IEvents[]>;
   create: (event: IEvents) => Promise<IEvents>;
   findOneById: (id: string) => Promise<IEvents | null>;
-  updateOneById: (id: string, param: IEvents) => Promise<UpdateWriteOpResult>;
+  updateOneById: (id: string, param: IEvents) => Promise<IEvents | null>;
 }
 
 @injectable()
@@ -29,7 +29,7 @@ export class EventServiceImpl implements EventService {
     return response
   }
 
-  async updateOneById(id: string, param: IEvents): Promise<UpdateWriteOpResult> {
+  async updateOneById(id: string, param: IEvents): Promise<IEvents | null> {
     const response = await EventModel.findOneAndUpdate({ _id: id }, param);
     return response
   }

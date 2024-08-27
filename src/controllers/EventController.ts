@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { IEvents } from 'src/models';
 
 import {
-  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { BadRequestError } from '../../packages/REST/errors/exceptions/BadRequestError';
 import { EventService, UserService } from '../services';
@@ -42,7 +42,7 @@ export class EventController {
   @Authorization
   async updateOneById(
     @ContextRequest request: express.Request<any, any, IEvents>,
-  ): Promise<IEvents> {
+  ): Promise<IEvents | null> {
     const { id } = request.params;
     const param = request.body;
     const event = await this.eventService.findOneById(id);
