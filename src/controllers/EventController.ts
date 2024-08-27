@@ -1,12 +1,14 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { IEvents } from 'src/models';
+import { Pagination } from 'src/utils/Pagination';
 
 import {
-    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { BadRequestError } from '../../packages/REST/errors/exceptions/BadRequestError';
 import { EventService, UserService } from '../services';
+import { IResponseList } from '../utils/Paginator';
 
 @Controller('/event')
 @injectable()
@@ -20,8 +22,12 @@ export class EventController {
 
   @GET('/v1/list')
   @Authorization
-  async getAllEvent(): Promise<IEvents[]> {
-    const event = await this.eventService.getAll();
+  async getAllEvent(
+    @ContextRequest request: express.Request,
+  ): Promise<IResponseList<IEvents>> {
+    const name = request.query['name'];
+    const { limit, offset } = new Pagination(request).getParam();
+    const event = await this.eventService.getAllWithPagination(limit, offset);
     return event;
   }
 

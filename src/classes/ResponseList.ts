@@ -5,7 +5,7 @@ export class ResponseList<T> {
   limit = 0;
   hasNext: boolean;
 
-  constructor(data: T[], total: number = data.length, limit = 0, offset = 0) {
+  constructor(data: T[] = [], total: number = data.length, limit = 0, offset = 0) {
     this.data = data;
     this.total = total;
     this.offset = offset;

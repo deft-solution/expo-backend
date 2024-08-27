@@ -7,7 +7,7 @@ import { IResponseList, Paginator } from '../utils/Paginator';
 
 export interface EventService {
   getAll: () => Promise<IEvents[]>;
-  getAllWithPagination: (offset: number, limit: number, filter?: FilterQuery<IEvents>) => Promise<IResponseList<IEvents>>;
+  getAllWithPagination: (offset: number, limit: number, query?: any) => Promise<IResponseList<IEvents>>;
   create: (event: IEvents) => Promise<IEvents>;
   findOneById: (id: string) => Promise<IEvents | null>;
   updateOneById: (id: string, param: IEvents) => Promise<IEvents | null>;
@@ -21,13 +21,15 @@ export class EventServiceImpl implements EventService {
     return response
   }
 
-  async getAllWithPagination(offset: number, limit: number, filter: FilterQuery<IEvents> = {}): Promise<IResponseList<IEvents>> {
-    if (filter.name) {
-      filter['name'] = { $regex: filter['name'], $options: 'i' };
+  async getAllWithPagination(offset: number, limit: number, query: any): Promise<IResponseList<IEvents>> {
+    const filter: FilterQuery<IEvents> = {};
+
+    if (query.name) {
+      Object.assign(filter, { name: { $regex: query.name, $options: 'i' } })
     }
+
     const data = await EventModel.find(filter).skip(offset).limit(limit).exec();
     const total = await EventModel.countDocuments(filter).exec();
-
 
     const response = await new Paginator<IEvents>(data, total, offset, limit).paginate();
     return response;
