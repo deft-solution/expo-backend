@@ -25,7 +25,6 @@ export class EventController {
   async getAllEvent(
     @ContextRequest request: express.Request,
   ): Promise<IResponseList<IEvents>> {
-    const name = request.query['name'];
     const { limit, offset } = new Pagination(request).getParam();
     const event = await this.eventService.getAllWithPagination(limit, offset);
     return event;
