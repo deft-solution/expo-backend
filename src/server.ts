@@ -8,9 +8,7 @@ import mongoose, { ConnectOptions } from 'mongoose';
 import morgan from 'morgan';
 import * as path from 'path';
 
-import {
-  ErrorCode, HttpError, InternalServerError, MissingParamError, NotFoundError, REST
-} from '../packages';
+import { ErrorCode, HttpError, InternalServerError, NotFoundError, REST } from '../packages';
 import controllers from './controllers';
 import Authentications from './middlewares/Authentications';
 
@@ -40,7 +38,7 @@ class Server {
 
     // Morgan logging middleware
     this.app.use(morgan('dev'));
-    console.log(__dirname)
+
     // add static paths
     this.app.use(express.static("public"));
 
@@ -67,24 +65,16 @@ class Server {
       // Handle known exceptions
       if (err instanceof HttpError) {
         const httpError = err as HttpError;
-        res
+        return res
           .status(httpError.statusCode)
           .json(httpError.toJSON());
-        return;
       }
 
-      // Handle ValidationError Mongoose
-      if (err instanceof mongoose.Error.ValidationError) {
-        const error = new MissingParamError(err.message);
-        res
-          .status(ErrorCode.BadRequest)
-          .json(error.toJSON());
-      }
 
       // Handle uncaught or unknown exceptions
       if (err instanceof Error) {
         const error = new InternalServerError(`Uncaught Exception: ${err.message}`);
-        res
+        return res
           .status(ErrorCode.InternalServerError)
           .json(error.toJSON());
       }

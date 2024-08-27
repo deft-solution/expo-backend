@@ -1,6 +1,7 @@
 import { REST } from '../../packages';
 import { AuthenticationController } from './AuthenticationController';
 import { BabyController } from './BabyController';
+import { EventController } from './EventController';
 import { FileController } from './FileController';
 import { ProfileController } from './ProfileController';
 import { SocialLinkController } from './SocialLinkController';
@@ -14,6 +15,7 @@ REST.register('FileController', FileController);
 REST.register('ProfileController', ProfileController);
 REST.register('SocialLinkController', SocialLinkController);
 REST.register('VerificationController', VerificationController);
+REST.register('EventController', EventController);
 
 export default [
   BabyController, // Demo
@@ -24,4 +26,5 @@ export default [
   ProfileController,
   SocialLinkController,
   VerificationController,
+  EventController,
 ]

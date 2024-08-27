@@ -8,9 +8,12 @@ export interface IEvents extends Document {
   thumbnailUrl: string;
   startFrom: Date;
   endDate: Date;
+  phoneNumber: string;
+  email: string;
   location: string;
   createdBy: PopulatedDoc<IUser>;
   createdAt: Date;
+  isActive: boolean;
 }
 
 const EventSchema: Schema<IEvents> = new Schema<IEvents>(
@@ -27,6 +30,18 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
       type: String,
       required: false,
     },
+    location: {
+      type: String,
+      required: false,
+    },
+    phoneNumber: {
+      type: String,
+      required: false,
+    },
+    email: {
+      type: String,
+      required: false,
+    },
     startFrom: {
       type: Date,
       required: true,
@@ -34,6 +49,10 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
     endDate: {
       type: Date,
       required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     createdAt: {
       type: Date,
