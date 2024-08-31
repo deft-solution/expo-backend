@@ -166,7 +166,19 @@ export const ExhibitorSchema: Schema<IExhibitor> = new Schema<IExhibitor>({
     required: true,
     ref: "Users"
   }
-});
+},
+  {
+    timestamps: true,
+    toJSON: {
+      transform: function (_doc, ret) {
+        // Transform the _id field to id
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+  },
+);
 
 const Exhibitors: Model<IExhibitor> = mongoose.model<IExhibitor>('Exhibitors', ExhibitorSchema);
 export default Exhibitors;
