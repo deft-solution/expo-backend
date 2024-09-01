@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
 
 import {
-    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IExhibitor } from '../models';
@@ -69,7 +69,8 @@ export class ExhibitionController {
   async updateExhibition(
     @ContextRequest req: express.Request<any, any, IExhibitor>,
   ): Promise<IExhibitor> {
-    const response = await this.exhibitionService.findOneByIdAndUpdate(req.body);
+    const { id } = req.params;
+    const response = await this.exhibitionService.findOneByIdAndUpdate(id, req.body);
     if (!response) {
       throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted);
     }
