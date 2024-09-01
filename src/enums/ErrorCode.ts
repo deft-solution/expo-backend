@@ -4,4 +4,8 @@ export enum ErrorCode {
   //
   InvalidPassword = 2000,
   InvalidToken = 2001,
+
+  // Exhibition
+  ExhibitionDoesNotExisted = 3000,
+
 }

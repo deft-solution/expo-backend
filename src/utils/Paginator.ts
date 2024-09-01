@@ -3,6 +3,11 @@ import { Document } from 'mongoose';
 import { BadRequestError } from '../../packages';
 import { ResponseList } from '../classes/ResponseList';
 
+export interface IPagination {
+  offset: number;
+  limit: number;
+}
+
 export interface IResponseList<T> {
   data: T[];
   total: number;

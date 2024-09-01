@@ -1,12 +1,15 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
-import { IResponseList } from 'src/utils/Paginator';
 
-import { Authorization, ContextRequest, Controller, GET, POST, PUT } from '../../packages';
+import {
+    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+} from '../../packages';
+import { ErrorCode } from '../enums/ErrorCode';
 import { IExhibitor } from '../models';
 import { ExhibitionService } from '../services';
 import { Pagination } from '../utils/Pagination';
+import { IResponseList } from '../utils/Paginator';
 
 @Controller('/exhibition')
 @injectable()
@@ -33,7 +36,21 @@ export class ExhibitionController {
       Object.assign(filter, { tags: { $in: tags } })
     }
 
-    const response = await this.exhibitionService.getAllWithPagination(offset, limit, filter);
+    const response = await this.exhibitionService.getAllWithPagination({ offset, limit }, filter, { createdAt: 'desc' });
+    return response;
+  }
+
+  @GET('/v1/:id')
+  @Authorization
+  async findExhibitionById(
+    @ContextRequest req: express.Request<any, any, IExhibitor>,
+  ): Promise<IExhibitor> {
+    const { id } = req.params;
+    const response = await this.exhibitionService.findOneById(id);
+    if (!response) {
+      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted)
+    }
+
     return response;
   }
 
@@ -51,8 +68,11 @@ export class ExhibitionController {
   @Authorization
   async updateExhibition(
     @ContextRequest req: express.Request<any, any, IExhibitor>,
-  ): Promise<IExhibitor | null> {
+  ): Promise<IExhibitor> {
     const response = await this.exhibitionService.findOneByIdAndUpdate(req.body);
+    if (!response) {
+      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted)
+    }
     return response;
   }
 }
