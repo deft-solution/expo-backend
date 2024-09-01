@@ -48,7 +48,7 @@ export class ExhibitionController {
     const { id } = req.params;
     const response = await this.exhibitionService.findOneById(id);
     if (!response) {
-      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted)
+      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted);
     }
 
     return response;
