@@ -29,11 +29,11 @@ export class ExhibitionController {
     const filter: FilterQuery<IExhibitor> = {};
 
     if (name) {
-      Object.assign(filter, { name: { $regex: name, $options: 'i' } })
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
     }
 
     if (tags?.length) {
-      Object.assign(filter, { tags: { $in: tags } })
+      Object.assign(filter, { tags: { $in: tags } });
     }
 
     const response = await this.exhibitionService.getAllWithPagination({ offset, limit }, filter, { createdAt: 'desc' });
@@ -71,7 +71,7 @@ export class ExhibitionController {
   ): Promise<IExhibitor> {
     const response = await this.exhibitionService.findOneByIdAndUpdate(req.body);
     if (!response) {
-      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted)
+      throw new NotFoundError('Exhibition does not existed', ErrorCode.ExhibitionDoesNotExisted);
     }
     return response;
   }
