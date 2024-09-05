@@ -11,7 +11,7 @@ export interface BaseService<T extends Document> {
   findOneById: (id: string) => Promise<T | null>;
   findOneByIdAndUpdate: (id: mongoose.Types.ObjectId, data: UpdateQuery<T>) => Promise<T | null>;
   getAllWithPagination: (pagination: IPagination, query: FilterQuery<T>, orderObject?: any) => Promise<IResponseList<T>>
-  getAllAutoComplete: (query?: FilterQuery<T>) => Promise<T[]>
+  getAllAutoComplete: (query?: FilterQuery<T>, columns?: string[]) => Promise<T[]>
 }
 
 @injectable()
@@ -33,14 +33,14 @@ export class BaseServiceImpl<T extends Document> implements BaseService<T> {
     return document;
   }
 
-  async getAllAutoComplete(query: FilterQuery<T> = {}) {
+  async getAllAutoComplete(query: FilterQuery<T> = {}, columns = ['id', 'name']) {
     const filter: FilterQuery<T> = {};
 
     if (query) {
       Object.assign(filter, query)
     }
 
-    const documents = await this.model.find(filter).select(['id', 'name']).exec();
+    const documents = await this.model.find(filter).select(columns).exec();
     return documents;
   }
 

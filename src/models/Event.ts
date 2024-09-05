@@ -16,6 +16,7 @@ export interface IEvents extends Document {
   createdBy: PopulatedDoc<IUser>;
   createdAt: Date;
   isActive: boolean;
+  booths: mongoose.Types.ObjectId[]; // Array of Booth references
 }
 
 const EventSchema: Schema<IEvents> = new Schema<IEvents>(
@@ -72,6 +73,11 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
       type: Schema.Types.ObjectId,
       required: true,
       ref: "Users"
+    },
+    booths: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'Booth' }],
+      required: false,
+      default: []
     }
   },
   {

@@ -6,8 +6,9 @@ export interface IBooth extends Document {
   boothNumber: string;
   hall: string;
   size: string;
-  exhibitor: mongoose.Types.ObjectId;
+  event: mongoose.Types.ObjectId;
   mapUrl: string;
+  isActive: boolean;
   boothType: mongoose.Types.ObjectId;
   createdBy: PopulatedDoc<IUser>;
 }
@@ -17,7 +18,8 @@ export const BoothSchema: Schema = new Schema({
   hall: { type: String, required: true },
   size: { type: String, required: false },
   mapUrl: { type: String, required: false },
-  exhibitor: { type: Schema.Types.ObjectId, ref: 'Exhibitor', required: true },
+  isActive: { type: Boolean, default: true },
+  event: { type: Schema.Types.ObjectId, ref: 'Events', required: true },
   boothType: { type: Schema.Types.ObjectId, ref: 'BoothType', required: true },
   createdBy: {
     type: Schema.Types.ObjectId,
