@@ -5,7 +5,9 @@ import { IUser } from './User';
 export interface IEvents extends Document {
   name: string;
   description: string;
-  thumbnailUrl: string;
+  floorPlanUrl: string;
+  mainWebsiteUrl: string;
+  logoUrl: string;
   startFrom: Date;
   endDate: Date;
   phoneNumber: string;
@@ -26,9 +28,25 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
       type: String,
       required: false,
     },
-    thumbnailUrl: {
+    floorPlanUrl: {
       type: String,
       required: false,
+    },
+    mainWebsiteUrl: {
+      type: String,
+      required: false,
+    },
+    logoUrl: {
+      type: String,
+      required: false,
+    },
+    startFrom: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
     },
     location: {
       type: String,
@@ -41,14 +59,6 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
     email: {
       type: String,
       required: false,
-    },
-    startFrom: {
-      type: Date,
-      required: true,
-    },
-    endDate: {
-      type: Date,
-      required: true,
     },
     isActive: {
       type: Boolean,

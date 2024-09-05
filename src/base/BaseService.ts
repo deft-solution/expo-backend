@@ -24,7 +24,7 @@ export class BaseServiceImpl<T extends Document> implements BaseService<T> {
   }
 
   async findOneById(id: string): Promise<T | null> {
-    const data = this.model.findById(id);
+    const data = await this.model.findById(id);
     return data;
   };
 
@@ -47,6 +47,7 @@ export class BaseServiceImpl<T extends Document> implements BaseService<T> {
   async getAllWithPagination(pagination: IPagination, query: FilterQuery<T>, orderObject: any = {}): Promise<IResponseList<T>> {
     const { limit, offset } = pagination
     const filter: FilterQuery<T> = {};
+    Object.assign(orderObject, { startFrom: 1 })
 
     if (query) {
       Object.assign(filter, query)

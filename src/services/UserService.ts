@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { FilterQuery } from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 
 import { BadRequestError, NotFoundError } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
@@ -18,6 +18,7 @@ export interface UserService {
   findActiveOne: (filter: FilterQuery<IUser>) => Promise<IUser | null>;
   findByIdActive: (id: string) => Promise<IUser>;
   findByIdAndUpdate: (user: IUser) => Promise<IUser | null>;
+  isValidObjectId: (id: string) => boolean
 }
 
 @injectable()
@@ -85,6 +86,11 @@ export class UserServiceImpl implements UserService {
 
   findByIdAndUpdate(user: IUser): Promise<IUser | null> {
     return User.findByIdAndUpdate(user.id, user).exec();
+  }
+
+  isValidObjectId(id: string) {
+    const isValid = mongoose.Types.ObjectId.isValid(id)
+    return isValid;
   }
 
   private _generateToken(userId: string): AccessToken {

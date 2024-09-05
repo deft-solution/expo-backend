@@ -1,33 +1,59 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
+import mongoose, { FilterQuery } from 'mongoose';
 
 import {
-  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { BadRequestError } from '../../packages/REST/errors/exceptions/BadRequestError';
+import { ErrorCode } from '../enums/ErrorCode';
 import { IEvents } from '../models';
 import { EventService, UserService } from '../services';
 import { Pagination } from '../utils/Pagination';
 import { IResponseList } from '../utils/Paginator';
 
-@Controller('/event')
+@Controller('/events')
 @injectable()
 export class EventController {
 
   @inject('EventService')
-  eventService!: EventService;
+  eventSv!: EventService;
 
   @inject('UserService')
-  userService!: UserService;
+  userSv!: UserService;
 
   @GET('/v1/list')
-  // @Authorization
+  @Authorization
   async getAllEvent(
     @ContextRequest request: express.Request,
   ): Promise<IResponseList<IEvents>> {
-    const { limit, offset } = new Pagination(request).getParam();
-    const event = await this.eventService.getAllWithPagination(offset, limit, request.query);
-    return event;
+    const pagination = new Pagination(request).getParam();
+    const { name } = request.query;
+    const filter: FilterQuery<IEvents> = {};
+
+    if (name) {
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
+    }
+
+    const events = await this.eventSv.getAllWithPagination(pagination, filter, { createdAt: 'desc' });
+    return events;
+  }
+
+  @GET('/v1/on-going')
+  @Authorization
+  async getAllActiveAndUpcoming(
+    @ContextRequest request: express.Request,
+  ): Promise<IResponseList<IEvents>> {
+    const pagination = new Pagination(request).getParam();
+    const { name } = request.query;
+    const filter: FilterQuery<IEvents> = {};
+
+    if (name) {
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
+    }
+
+    const events = await this.eventSv.getActiveWithUpComingEvent(pagination, filter, { createdAt: 'desc' });
+    return events;
   }
 
   @GET('/v1/:id')
@@ -36,9 +62,9 @@ export class EventController {
     @ContextRequest request: express.Request<any, any, IEvents>,
   ): Promise<IEvents> {
     const { id } = request.params;
-    const event = await this.eventService.findOneById(id);
+    const event = await this.eventSv.findOneById(id);
     if (!event) {
-      throw new NotFoundError('This id doesn`t existed.')
+      throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted)
     }
     return event;
   }
@@ -47,14 +73,12 @@ export class EventController {
   @Authorization
   async updateOneById(
     @ContextRequest request: express.Request<any, any, IEvents>,
-  ): Promise<IEvents | null> {
+  ): Promise<IEvents> {
     const { id } = request.params;
-    const param = request.body;
-    const event = await this.eventService.findOneById(id);
-    if (!event) {
-      throw new NotFoundError('This id doesn`t existed.')
+    const response = await this.eventSv.findOneByIdAndUpdate(id, request.body) as IEvents;
+    if (!response) {
+      throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted);
     }
-    const response = await this.eventService.updateOneById(id, param)
     return response;
   }
 
@@ -67,9 +91,12 @@ export class EventController {
       throw new BadRequestError('Invalid User');
     }
     const param = request.body;
-    const user = await this.userService.findByIdActive(request.userId);
-    param['createdBy'] = user;
-    const event = await this.eventService.create(param);
+    const user = await this.userSv.findByIdActive(request.userId);
+    if (!user) {
+      throw new BadRequestError('User does not existed.', ErrorCode.UserDoesNotExist);
+    }
+    param['createdBy'] = request.userId;
+    const event = await this.eventSv.create(param);
     return event;
   }
 }

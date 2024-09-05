@@ -10,4 +10,7 @@ export enum ErrorCode {
 
   // BoothType
   BoothTypeDoesNotExisted = 4000,
+
+  // Exhibition
+  EventDoesNotExisted = 5000,
 }
