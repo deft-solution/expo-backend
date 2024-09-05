@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
 
 import {
-  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IExhibitor } from '../models';
@@ -37,6 +37,23 @@ export class ExhibitionController {
     }
 
     const response = await this.exhibitionService.getAllWithPagination({ offset, limit }, filter, { createdAt: 'desc' });
+    return response;
+  }
+
+  @GET('/v1/autocomplete')
+  @Authorization
+  async getAllForAutoComplete(
+    @ContextRequest req: express.Request<any, any, IExhibitor>,
+  ): Promise<IExhibitor[]> {
+    const { name } = req.query;
+
+    const filter: FilterQuery<IExhibitor> = { isActive: true };
+
+    if (name) {
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
+    }
+
+    const response = this.exhibitionService.getAllAutoComplete(filter)
     return response;
   }
 

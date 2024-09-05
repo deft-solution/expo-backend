@@ -16,6 +16,7 @@ export interface IExhibitor extends Document {
   //
   createdAt: Date;
   createdBy: PopulatedDoc<IUser>;
+  booths: mongoose.Types.ObjectId[]; // Array of Booth references
 }
 
 export interface ILocation {
@@ -165,6 +166,11 @@ export const ExhibitorSchema: Schema<IExhibitor> = new Schema<IExhibitor>({
     type: Schema.Types.ObjectId,
     required: true,
     ref: "Users"
+  },
+  booths: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Booth' }],
+    required: false,
+    default: []
   }
 },
   {

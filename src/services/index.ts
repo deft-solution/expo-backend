@@ -1,5 +1,7 @@
 import { REST } from '../../packages';
 import { BabyService, BabyServiceImpl } from './BabyService';
+import { BoothService, BoothServiceImpl } from './BoothService';
+import { BoothTypeService, BoothTypeServiceImpl } from './BoothTypeService';
 import { EventService, EventServiceImpl } from './EventService';
 import { ExhibitionService, ExhibitionServiceImpl } from './ExhibitionService';
 import { SocialLinkService, SocialLinkServiceImpl } from './SocialLinkService';
@@ -12,6 +14,8 @@ REST.register("SocialLinkService", SocialLinkServiceImpl);
 REST.register("VerificationService", VerificationServiceImpl);
 REST.register("EventService", EventServiceImpl);
 REST.register("ExhibitionService", ExhibitionServiceImpl);
+REST.register("BoothTypeService", BoothTypeServiceImpl);
+REST.register("BoothService", BoothServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -26,4 +30,8 @@ export {
   EventServiceImpl,
   ExhibitionService,
   ExhibitionServiceImpl,
+  BoothTypeService,
+  BoothTypeServiceImpl,
+  BoothService,
+  BoothServiceImpl,
 };
