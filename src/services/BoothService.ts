@@ -43,7 +43,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
       Object.assign(filter, query)
     }
 
-    const data = await this.model.find(filter).populate('event').sort(orderObject).skip(offset).limit(limit).exec();
+    const data = await this.model.find(filter).populate('event').populate('boothType').sort(orderObject).skip(offset).limit(limit).exec();
     const total = await this.model.countDocuments(filter).exec();
 
     const response = await new Paginator<IBooth>(data, total, offset, limit).paginate();
