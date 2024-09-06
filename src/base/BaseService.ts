@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import mongoose, {
-    ClientSession, Document, FilterQuery, Model, SaveOptions, UpdateQuery
+  ClientSession, Document, FilterQuery, Model, SaveOptions, UpdateQuery
 } from 'mongoose';
 import { IPagination, IResponseList } from 'src/utils/Paginator';
 

@@ -1,13 +1,15 @@
 import { injectable } from 'inversify';
-import mongoose from 'mongoose';
+import { FilterQuery } from 'mongoose';
 
 import { BaseService, BaseServiceImpl } from '../base/BaseService';
 import { TransactionManager } from '../base/TransactionManager';
 import Booth, { IBooth } from '../models/Booth';
 import EventModel from '../models/Event';
+import { IPagination, IResponseList, Paginator } from '../utils/Paginator';
 
 export interface BoothService extends BaseService<IBooth> {
   createTrx: (data: Partial<IBooth>) => Promise<IBooth>;
+  getAllWithPagination: (pagination: IPagination, query: FilterQuery<IBooth>, orderObject?: any) => Promise<IResponseList<IBooth>>
 }
 
 @injectable()
@@ -30,5 +32,21 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
     } catch (error) {
       throw error;
     }
+  }
+
+  async getAllWithPagination(pagination: IPagination, query: FilterQuery<IBooth>, orderObject: any = {}): Promise<IResponseList<IBooth>> {
+    const { limit, offset } = pagination
+    const filter: FilterQuery<IBooth> = {};
+    Object.assign(orderObject, { startFrom: 1 })
+
+    if (query) {
+      Object.assign(filter, query)
+    }
+
+    const data = await this.model.find(filter).populate('event').sort(orderObject).skip(offset).limit(limit).exec();
+    const total = await this.model.countDocuments(filter).exec();
+
+    const response = await new Paginator<IBooth>(data, total, offset, limit).paginate();
+    return response;
   }
 }
