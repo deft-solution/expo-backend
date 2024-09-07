@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import mongoose, { FilterQuery } from 'mongoose';
 
 import {
-    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { BadRequestError } from '../../packages/REST/errors/exceptions/BadRequestError';
 import { ErrorCode } from '../enums/ErrorCode';
@@ -54,6 +54,23 @@ export class EventController {
 
     const events = await this.eventSv.getActiveWithUpComingEvent(pagination, filter, { createdAt: 'desc' });
     return events;
+  }
+
+  @GET('/v1/autocomplete')
+  @Authorization
+  async getAllForAutoComplete(
+    @ContextRequest req: express.Request<any, any, IEvents>,
+  ): Promise<IEvents[]> {
+    const { name } = req.query;
+
+    const filter: FilterQuery<IEvents> = { isActive: true };
+
+    if (name) {
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
+    }
+
+    const response = await this.eventSv.getAllAutoComplete(filter,)
+    return response;
   }
 
   @GET('/v1/:id')

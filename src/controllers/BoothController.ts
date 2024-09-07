@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
 
 import {
-    Authorization, BadRequestError, ContextRequest, Controller, GET, POST, PUT
+  Authorization, BadRequestError, ContextRequest, Controller, GET, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IBooth } from '../models/Booth';
@@ -28,7 +28,7 @@ export class BoothController {
   ): Promise<IResponseList<IBooth>> {
     const pagination = new Pagination(request).getParam();
 
-    const booths = await this.boothSv.getAllWithPagination(pagination, {});
+    const booths = await this.boothSv.getAllWithPagination(pagination, {}, { createdAt: 'desc' });
     return booths;
   }
 
