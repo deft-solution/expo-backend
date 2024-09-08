@@ -9,6 +9,12 @@ export function generateAccessToken(userId: number | string, expiresIn: string |
   return jwt.sign({ userId, expiresIn }, secret);
 }
 
+export function signJWT(payload: string | Buffer | object, expiresIn: string | number,): string {
+  const secret = process.env.JWT_SECRET_KEY ?? "JWT_SECRET_KEY" as string;
+  Object.assign(payload, { expiresIn });
+  return jwt.sign(payload, secret);
+}
+
 export function verifyJWTToken(token: string): Promise<string | jwt.JwtPayload | undefined> {
   return new Promise((resolve) => {
     jwt.verify(token, process.env.JWT_SECRET_KEY ?? '', (error, decoded: string | jwt.JwtPayload | undefined) => {

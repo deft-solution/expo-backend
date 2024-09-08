@@ -1,8 +1,8 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
-import mongoose from 'mongoose';
 
-import { ContextRequest, Controller, POST } from '../../packages';
+import { ContextRequest, Controller, Middleware, MissingParamError, POST } from '../../packages';
+import VerifyExhibitionToken from '../middlewares/VerifyExhibitionToken';
 import { AccessToken } from '../models/Token';
 import { IUser } from '../models/User';
 import { UserService } from '../services/UserService';
@@ -51,6 +51,23 @@ export class AuthenticationController {
     @ContextRequest request: express.Request<any, any, IUser>,
   ): Promise<AccessToken> {
     const param = request.body;
+    const token = await this.userService.signUp(param);
+    return token;
+  }
+
+  @POST('/v1/exhibition/sign-up')
+  @Middleware(VerifyExhibitionToken)
+  async createExhibitionUser(
+    @ContextRequest request: express.Request<any, any, IUser>,
+  ): Promise<AccessToken> {
+    if (!request.email) {
+      throw new MissingParamError('email');
+    }
+    const param = request.body;
+    param['username'] = request.email;
+    param['email'] = request.email;
+    param['isExhibitor'] = true;
+    param['hasVerify'] = true;
     const token = await this.userService.signUp(param);
     return token;
   }

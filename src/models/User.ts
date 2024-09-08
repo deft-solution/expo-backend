@@ -1,7 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 import { UserStatus } from '../enums/UserStatus';
-import { ISocialLink } from './SocialLink';
 
 export interface IUser extends Document {
   email: string;
@@ -12,44 +11,22 @@ export interface IUser extends Document {
   updatedAt: Date;
   lastLoginAt: Date;
   hasVerify: Boolean;
+  isExhibitor: Boolean;
   //
   profile: UserProfile;
-  socials: UserSocialLink[];
 }
 
 export interface UserProfile {
   firstName: string | null;
   lastName: string | null;
   profileImageUrl: string | null;
-  title: string;
-  bio: string;
 }
 
 export interface SocialLink {
   firstName: string | null;
   lastName: string | null;
   profileImageUrl: string | null;
-  title: string;
-  bio: string;
 }
-
-export interface UserSocialLink {
-  url: string;
-  social: ISocialLink;
-}
-
-const UserSocialLink: Schema<UserSocialLink> = new Schema<UserSocialLink>({
-  url: {
-    type: String,
-    required: false,
-    default: null,
-  },
-  social: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: "SocialLink",
-  }
-})
 
 const UserProfileSchema: Schema<UserProfile> = new Schema<UserProfile>({
   firstName: {
@@ -63,16 +40,6 @@ const UserProfileSchema: Schema<UserProfile> = new Schema<UserProfile>({
     default: null,
   },
   profileImageUrl: {
-    type: String,
-    required: false,
-    default: null,
-  },
-  title: {
-    type: String,
-    required: false,
-    default: null,
-  },
-  bio: {
     type: String,
     required: false,
     default: null,
@@ -124,12 +91,12 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
       default: false,
       required: false,
     },
-    profile: UserProfileSchema,
-    socials: {
-      type: [UserSocialLink],
-      default: [],
+    isExhibitor: {
+      type: Boolean,
+      default: false,
       required: false,
     },
+    profile: UserProfileSchema,
   },
   {
     timestamps: true,
