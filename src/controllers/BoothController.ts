@@ -1,6 +1,6 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 
 import {
   Authorization, BadRequestError, ContextRequest, Controller, GET, POST, PUT
@@ -80,7 +80,9 @@ export class BoothController {
   async create(
     @ContextRequest req: express.Request<any, any, IBooth>,
   ): Promise<IBooth> {
-    req.body['createdBy'] = req.userId;
+    if (req.userId) {
+      req.body['createdBy'] = new Types.ObjectId(req.userId);
+    }
 
     const booth = await this.boothSv.createTrx(req.body);
     return booth;

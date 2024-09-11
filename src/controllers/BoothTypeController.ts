@@ -1,9 +1,9 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 
 import {
-    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IBoothType } from '../models/BoothType';
@@ -76,7 +76,9 @@ export class BoothTypeController {
   async create(
     @ContextRequest req: express.Request<any, any, IBoothType>,
   ): Promise<IBoothType> {
-    req.body['createdBy'] = req.userId;
+    if (req.userId) {
+      req.body['createdBy'] = new Types.ObjectId(req.userId);
+    }
     const response = await this.boothTypeSv.create(req.body)
     return response;
   }

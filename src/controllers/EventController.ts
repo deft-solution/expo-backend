@@ -112,7 +112,7 @@ export class EventController {
     if (!user) {
       throw new BadRequestError('User does not existed.', ErrorCode.UserDoesNotExist);
     }
-    param['createdBy'] = request.userId;
+    param['createdBy'] = user;
     const event = await this.eventSv.create(param);
     return event;
   }

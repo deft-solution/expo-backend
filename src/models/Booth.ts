@@ -1,6 +1,4 @@
-import mongoose, { Document, PopulatedDoc, Schema } from 'mongoose';
-
-import { IUser } from './User';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IBooth extends Document {
   boothNumber: string;
@@ -10,7 +8,7 @@ export interface IBooth extends Document {
   mapUrl: string;
   isActive: boolean;
   boothType: mongoose.Types.ObjectId;
-  createdBy: PopulatedDoc<IUser>;
+  createdBy: mongoose.Types.ObjectId;
 }
 
 export const BoothSchema: Schema = new Schema({

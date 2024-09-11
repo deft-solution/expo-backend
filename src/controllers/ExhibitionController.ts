@@ -1,9 +1,9 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 
 import {
-    Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IExhibitor } from '../models';
@@ -76,7 +76,9 @@ export class ExhibitionController {
   async createExhibition(
     @ContextRequest req: express.Request<any, any, IExhibitor>,
   ): Promise<IExhibitor> {
-    req.body['createdBy'] = req.userId;
+    if (req.userId) {
+      req.body['createdBy'] = new Types.ObjectId(req.userId);
+    }
     const response = await this.exhibitionService.create(req.body);
     return response;
   }
