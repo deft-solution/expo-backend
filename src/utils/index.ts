@@ -9,6 +9,6 @@ export class Utils {
       return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
-    return '1111';
+    return '111111';
   }
 }
