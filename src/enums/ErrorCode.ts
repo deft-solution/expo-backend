@@ -1,6 +1,8 @@
 export enum ErrorCode {
   UserDoesNotExist = 1000,
   UserIsExisted = 1001,
+  VerificationCodeHasSent = 1002,
+  InvalidVerificationCode = 1003,
   //
   InvalidPassword = 2000,
   InvalidToken = 2001,

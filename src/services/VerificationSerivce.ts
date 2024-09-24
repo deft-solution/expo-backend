@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import { BadRequestError } from '../../packages';
 import Mailer from '../configs/Mailer';
+import { ErrorCode } from '../enums/ErrorCode';
 import { VerificationType } from '../enums/VerificationType';
 import Verification, { IVerifications } from '../models/Verifications';
 import { Utils } from '../utils';
@@ -23,7 +24,7 @@ export class VerificationServiceImpl implements VerificationService {
   async create(email: string): Promise<IVerifications> {
     let verification = await this.#findByTypeEmailWhereHasExpired(email);
     if (verification) {
-      throw new BadRequestError('We have sent verification to this email!');
+      throw new BadRequestError('We have sent verification to this email!', ErrorCode.VerificationCodeHasSent);
     }
     const code = Utils.generateVerificationCode();
     verification = new Verification();
@@ -42,11 +43,11 @@ export class VerificationServiceImpl implements VerificationService {
   async validate(recipient: string, code: string) {
     const verification = await this.#findTheLatestOneByType(recipient);
     if (!verification || verification?.expiresAt < new Date()) {
-      throw new BadRequestError('Invalid Verification');
+      throw new BadRequestError('Invalid Verification', ErrorCode.InvalidVerificationCode);
     }
     const isValid = validatePassword(code, verification.verificationCode)
     if (!isValid) {
-      throw new BadRequestError('Invalid Verification');
+      throw new BadRequestError('Invalid Verification', ErrorCode.InvalidVerificationCode);
     }
     return verification;
   }
