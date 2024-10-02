@@ -21,7 +21,7 @@ export const BoothSchema: Schema = new Schema({
   mapUrl: { type: String, required: false, default: null },
   externalId: { type: String, required: false, default: null },
   price: { type: Number, required: false, default: null },
-  description: { type: Number, required: false, default: null },
+  description: { type: String, required: false, default: null },
   isActive: { type: Boolean, default: true },
   event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
   boothType: { type: Schema.Types.ObjectId, ref: 'BoothType', required: true },
