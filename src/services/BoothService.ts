@@ -9,6 +9,7 @@ import { IPagination, IResponseList, Paginator } from '../utils/Paginator';
 
 export interface BoothService extends BaseService<IBooth> {
   createTrx: (data: Partial<IBooth>) => Promise<IBooth>;
+  getAllEventId: (eventId: string) => Promise<IBooth[]>;
   getAllWithPagination: (pagination: IPagination, query: FilterQuery<IBooth>, orderObject?: any) => Promise<IResponseList<IBooth>>
 }
 
@@ -18,6 +19,11 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
 
   constructor() {
     super();
+  }
+
+  async getAllEventId(eventId: string) {
+    const query = await Booth.find({ event: eventId, isActive: true }).populate('boothType');
+    return query;
   }
 
   async createTrx(data: Partial<IBooth>) {

@@ -1,9 +1,9 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
-import { FilterQuery, Types } from 'mongoose';
+import mongoose, { FilterQuery, Types } from 'mongoose';
 
 import {
-  Authorization, BadRequestError, ContextRequest, Controller, GET, POST, PUT
+  Authorization, BadRequestError, ContextRequest, Controller, GET, NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IBooth } from '../models/Booth';
@@ -29,6 +29,19 @@ export class BoothController {
     const pagination = new Pagination(request).getParam();
 
     const booths = await this.boothSv.getAllWithPagination(pagination, {}, { createdAt: 'desc' });
+    return booths;
+  }
+
+  @GET('/v1/guest/:eventId')
+  async getAllBoothsByEventID(
+    @ContextRequest request: express.Request,
+  ): Promise<IBooth[]> {
+    const { eventId } = request.params;
+    if (!mongoose.isValidObjectId(eventId)) {
+      throw new NotFoundError('We don`t have booth for this event yet.')
+    }
+
+    const booths = await this.boothSv.getAllEventId(eventId);
     return booths;
   }
 

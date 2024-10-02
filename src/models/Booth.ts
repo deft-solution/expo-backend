@@ -6,16 +6,22 @@ export interface IBooth extends Document {
   size: string;
   event: mongoose.Types.ObjectId;
   mapUrl: string;
+  externalId: string;
+  description: string;
+  price: Number;
   isActive: boolean;
   boothType: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
 }
 
 export const BoothSchema: Schema = new Schema({
-  boothNumber: { type: String, required: true },
-  hall: { type: String, required: true },
-  size: { type: String, required: false },
-  mapUrl: { type: String, required: false },
+  boothNumber: { type: String, required: true, default: null },
+  hall: { type: String, required: true, default: null },
+  size: { type: String, required: false, default: null },
+  mapUrl: { type: String, required: false, default: null },
+  externalId: { type: String, required: false, default: null },
+  price: { type: Number, required: false, default: null },
+  description: { type: Number, required: false, default: null },
   isActive: { type: Boolean, default: true },
   event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
   boothType: { type: Schema.Types.ObjectId, ref: 'BoothType', required: true },

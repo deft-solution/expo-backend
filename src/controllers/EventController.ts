@@ -79,10 +79,30 @@ export class EventController {
     @ContextRequest request: express.Request<any, any, IEvents>,
   ): Promise<IEvents> {
     const { id } = request.params;
+    if (!mongoose.isValidObjectId(id)) {
+      throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted)
+    }
     const event = await this.eventSv.findOneById(id);
     if (!event) {
       throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted)
     }
+    return event;
+  }
+
+  @GET('/v1/guest/:id')
+  async findOneByIdForGuest(
+    @ContextRequest request: express.Request<any, any, IEvents>,
+  ): Promise<IEvents> {
+    const { id } = request.params;
+    if (!mongoose.isValidObjectId(id)) {
+      throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted)
+    }
+
+    const event = await this.eventSv.findActiveOneById(id);
+    if (!event) {
+      throw new NotFoundError('This event doesn`t existed.', ErrorCode.EventDoesNotExisted)
+    }
+
     return event;
   }
 

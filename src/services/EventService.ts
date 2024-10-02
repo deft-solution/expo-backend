@@ -7,6 +7,7 @@ import EventModel from '../models/Event';
 import { IPagination, IResponseList, Paginator } from '../utils/Paginator';
 
 export interface EventService extends BaseService<IEvents> {
+  findActiveOneById: (id: string) => Promise<IEvents | null>;
   getActiveWithUpComingEvent: (pagination: IPagination, query: FilterQuery<IEvents>, orderObject?: any) => Promise<IResponseList<IEvents>>
 }
 
@@ -17,6 +18,11 @@ export class EventServiceImpl extends BaseServiceImpl<IEvents> implements EventS
 
   constructor() {
     super();
+  }
+
+  async findActiveOneById(id: string): Promise<IEvents | null> {
+    const query = await this.model.findOne({ _id: id, isActive: true });
+    return query;
   }
 
   async getActiveWithUpComingEvent(pagination: IPagination, query: FilterQuery<IEvents>, orderObject: any = {}): Promise<IResponseList<IEvents>> {
