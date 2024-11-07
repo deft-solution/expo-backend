@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+
 import { Currency } from '../enums/Currency';
 import { OrderStatus, PaymentStatus } from '../enums/Order';
 
