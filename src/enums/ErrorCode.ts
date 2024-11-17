@@ -16,4 +16,8 @@ export enum ErrorCode {
 
   // Exhibition
   EventDoesNotExisted = 5000,
+  ProductQuantityLimitExceeded = 5001,
+
+  // Order
+  WeDontHaveThisOrderYet = 60000,
 }

@@ -10,7 +10,6 @@ import { getJWTLifeTime, signJWT } from '../utils/jwt';
 @Controller('/verifications')
 @injectable()
 export class VerificationController {
-
   @inject('VerificationService')
   verificationSv!: VerificationService;
 
@@ -18,9 +17,7 @@ export class VerificationController {
   userSv!: UserService;
 
   @POST('/v1/send')
-  async sendEmailVerification(
-    @ContextRequest req: express.Request,
-  ): Promise<IVerifications> {
+  async sendEmailVerification(@ContextRequest req: express.Request): Promise<IVerifications> {
     const email = req.body.email;
     const user = await this.userSv.findOne({ username: email });
     if (user) {
@@ -31,9 +28,7 @@ export class VerificationController {
   }
 
   @POST('/v1/verify')
-  async verifiedEmailCode(
-    @ContextRequest req: express.Request,
-  ): Promise<any> {
+  async verifiedEmailCode(@ContextRequest req: express.Request): Promise<any> {
     const { email, code } = req.body;
     const user = await this.userSv.findOne({ username: email });
     if (user) {

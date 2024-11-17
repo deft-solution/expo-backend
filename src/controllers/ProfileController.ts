@@ -7,7 +7,6 @@ import { SocialLinkService, UserService } from '../services';
 @Controller('/profile')
 @injectable()
 export class ProfileController {
-
   @inject('UserService')
   userService!: UserService;
 
@@ -16,15 +15,13 @@ export class ProfileController {
 
   @GET('/v1/me')
   @Authorization
-  async getAllBaby(
-    @ContextRequest request: Request
-  ) {
+  async getAllBaby(@ContextRequest request: Request) {
     if (!request.userId) {
-      return {}
+      return {};
     }
     const user = await this.userService.findByIdActive(request.userId);
     if (!user) {
-      throw new NotFoundError('You are UnAuthorization!.')
+      throw new NotFoundError('You are UnAuthorization!.');
     }
     return user;
   }

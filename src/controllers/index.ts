@@ -6,6 +6,7 @@ import { BoothTypeController } from './BoothTypeController';
 import { EventController } from './EventController';
 import { ExhibitionController } from './ExhibitionController';
 import { FileController } from './FileController';
+import { OrderController } from './OrderController';
 import { ProfileController } from './ProfileController';
 import { SocialLinkController } from './SocialLinkController';
 import { VerificationController } from './VerificationController';
@@ -22,6 +23,7 @@ REST.register('EventController', EventController);
 REST.register('ExhibitionController', ExhibitionController);
 REST.register('BoothTypeController', BoothTypeController);
 REST.register('BoothController', BoothController);
+REST.register('OrderController', OrderController);
 
 export default [
   BabyController, // Demo
@@ -36,4 +38,5 @@ export default [
   ExhibitionController,
   BoothTypeController,
   BoothController,
-]
+  OrderController,
+];

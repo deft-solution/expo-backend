@@ -21,8 +21,8 @@ const SocialLinkSchema: Schema<ISocialLink> = new Schema<ISocialLink>(
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "Users"
-    }
+      ref: 'Users',
+    },
   },
   {
     timestamps: true,

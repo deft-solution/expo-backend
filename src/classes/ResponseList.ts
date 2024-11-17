@@ -10,7 +10,7 @@ export class ResponseList<T> {
     this.total = total;
     this.offset = offset;
     this.limit = limit;
-    this.hasNext = (this.offset + this.limit < this.total);
+    this.hasNext = this.offset + this.limit < this.total;
   }
 
   toJSON() {
@@ -20,7 +20,7 @@ export class ResponseList<T> {
       count: this.data.length,
       offset: this.offset,
       limit: this.limit,
-      hasNext: this.hasNext
+      hasNext: this.hasNext,
     };
   }
 

@@ -25,22 +25,21 @@ class Server {
   }
 
   private _config() {
-
     dotenv.config();
-    this.app.use(cors())
+    this.app.use(cors());
 
     // set port server
-    this.app.set("port", process.env.PORT || 3000);
+    this.app.set('port', process.env.PORT || 3000);
 
     // views
-    this.app.set("views", path.join(__dirname, "views"));
-    this.app.set("view engine", "ejs");
+    this.app.set('views', path.join(__dirname, 'views'));
+    this.app.set('view engine', 'ejs');
 
     // Morgan logging middleware
     this.app.use(morgan('dev'));
 
     // add static paths
-    this.app.use(express.static("public"));
+    this.app.use(express.static('public'));
 
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
@@ -56,7 +55,7 @@ class Server {
   private handlerError() {
     // catch 404 and forward to error handler
     this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-      const err = new NotFoundError("Not found");
+      const err = new NotFoundError('Not found');
       next(err);
     });
 
@@ -65,50 +64,43 @@ class Server {
       // Handle known exceptions
       if (err instanceof HttpError) {
         const httpError = err as HttpError;
-        return res
-          .status(httpError.statusCode)
-          .json(httpError.toJSON());
+        return res.status(httpError.statusCode).json(httpError.toJSON());
       }
-
 
       // Handle uncaught or unknown exceptions
       if (err instanceof Error) {
         const error = new InternalServerError(`Uncaught Exception: ${err.message}`);
-        return res
-          .status(ErrorCode.InternalServerError)
-          .json(error.toJSON());
+        return res.status(ErrorCode.InternalServerError).json(error.toJSON());
       }
       next(err);
     });
   }
 
-
   public start() {
     this._initDatabaseConnection()
       .then(() => {
-        this.app.listen(this.app.get("port"), () => {
+        this.app.listen(this.app.get('port'), () => {
           this._routes();
-          console.log(("App is running at http://localhost:%d in %s mode"), this.app.get("port"), this.app.get("env"));
-          console.log("Database Connected!")
-          console.log("Press CTRL-C to stop\n");
+          console.log('App is running at http://localhost:%d in %s mode', this.app.get('port'), this.app.get('env'));
+          console.log('Database Connected!');
+          console.log('Press CTRL-C to stop\n');
         });
       })
       .catch((err) => {
-        console.error(err)
-      })
+        console.error(err);
+      });
   }
 
   private _initDatabaseConnection(): Promise<typeof mongoose> {
-    const URL = process.env.MONGO_URL ?? "mongodb://127.0.0.1:27017";
+    const URL = process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017';
     const auth: ConnectOptions = {
       user: process.env.MONGO_USER,
       pass: process.env.MONGO_PASSWORD,
       dbName: process.env.MONGO_DB,
     };
-    return mongoose.connect(URL, auth)
+    return mongoose.connect(URL, auth);
   }
 }
-
 
 const server = new Server();
 server.start();

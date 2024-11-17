@@ -21,6 +21,6 @@ export class Pagination {
     return {
       limit: this.#limit,
       offset: this.#offset,
-    }
+    };
   }
 }

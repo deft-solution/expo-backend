@@ -8,29 +8,30 @@ export interface IVerifications extends Document {
   type: number;
 }
 
-const VerificationSchema: Schema<IVerifications> = new Schema<IVerifications>({
-  recipient: {
-    type: String,
-    required: true,
+const VerificationSchema: Schema<IVerifications> = new Schema<IVerifications>(
+  {
+    recipient: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: Number,
+      required: true,
+    },
+    verificationCode: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      required: true,
+    },
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
   },
-  type: {
-    type: Number,
-    required: true,
-  },
-  verificationCode: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  expiresAt: {
-    type: Date,
-    required: true,
-  },
-},
   {
     timestamps: true,
     toJSON: {

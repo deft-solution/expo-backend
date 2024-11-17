@@ -11,7 +11,7 @@ export default class Mailer<T extends Object> {
 
   private readonly _email: string | undefined = process.env.MAIL_USER;
   private readonly _password: string | undefined = process.env.MAIL_PASSWORD;
-  private readonly _templateDir = '/templates'
+  private readonly _templateDir = '/templates';
 
   /**
    * @example - '/src/templates/.....'
@@ -22,10 +22,10 @@ export default class Mailer<T extends Object> {
 
   constructor(mailTemplateDir: string, dataSource: T, options: Mail.Options) {
     if (!this._email) {
-      throw new Error('Missing MAIL_USER')
+      throw new Error('Missing MAIL_USER');
     }
     if (!this._password) {
-      throw new Error('Missing MAIL_PASSWORD')
+      throw new Error('Missing MAIL_PASSWORD');
     }
 
     this.options = options;
@@ -39,8 +39,8 @@ export default class Mailer<T extends Object> {
       auth: {
         user: this._email,
         pass: this._password,
-      }
-    })
+      },
+    });
   }
 
   async send() {
@@ -50,7 +50,7 @@ export default class Mailer<T extends Object> {
       console.log('Email sent successfully.');
     } catch (error: any) {
       console.error('Error sending email:', error);
-      throw new Error(error?.message)
+      throw new Error(error?.message);
     }
   }
 

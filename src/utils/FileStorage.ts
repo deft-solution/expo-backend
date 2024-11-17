@@ -22,7 +22,7 @@ export class FileStorage {
   request: Request;
   file: Express.Multer.File;
 
-  private readonly _publicPath = '/public'
+  private readonly _publicPath = '/public';
   /**
    * @description - Base Directory where the file would be stored
    */
@@ -38,7 +38,7 @@ export class FileStorage {
     this.folderName = param.folderName;
 
     if (!this.request.file) {
-      throw new MissingParamError('Files is empty!.')
+      throw new MissingParamError('Files is empty!.');
     }
     this.file = this.request.file;
     if (!this._isAllowExtension(this.file)) {
@@ -64,7 +64,7 @@ export class FileStorage {
         }
         const fileUrl = this.storageUrl.concat(fileDir).replace(this._publicPath, '');
 
-        resolve({ url: fileUrl, fileName })
+        resolve({ url: fileUrl, fileName });
       });
 
       // Handle the 'finish' event for each stream

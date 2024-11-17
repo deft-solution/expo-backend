@@ -11,13 +11,12 @@ import { hashPassword, validatePassword } from '../utils/bycryp';
 import { UserService } from './UserService';
 
 export interface VerificationService {
-  create: (email: string) => Promise<IVerifications>
-  validate: (email: string, code: string) => Promise<IVerifications>
+  create: (email: string) => Promise<IVerifications>;
+  validate: (email: string, code: string) => Promise<IVerifications>;
 }
 
 @injectable()
 export class VerificationServiceImpl implements VerificationService {
-
   @inject('UserService')
   userService!: UserService;
 
@@ -45,7 +44,7 @@ export class VerificationServiceImpl implements VerificationService {
     if (!verification || verification?.expiresAt < new Date()) {
       throw new BadRequestError('Invalid Verification', ErrorCode.InvalidVerificationCode);
     }
-    const isValid = validatePassword(code, verification.verificationCode)
+    const isValid = validatePassword(code, verification.verificationCode);
     if (!isValid) {
       throw new BadRequestError('Invalid Verification', ErrorCode.InvalidVerificationCode);
     }
@@ -56,7 +55,7 @@ export class VerificationServiceImpl implements VerificationService {
     const verification = await Verification.findOne({ recipient, type })
       .sort({ createdAt: -1 }) // Sort by `createdAt` in descending order
       .limit(1);
-    return verification
+    return verification;
   }
 
   async isValidVerification(recipient: string, code: string): Promise<Boolean> {
@@ -67,14 +66,19 @@ export class VerificationServiceImpl implements VerificationService {
     if (!verification || verification?.expiresAt < new Date()) {
       return false;
     }
-    return validatePassword(code, verification.verificationCode)
+    return validatePassword(code, verification.verificationCode);
   }
 
   async #findByTypeEmailWhereHasExpired(email: string) {
-    return Verification.findOne({ recipient: email, type: VerificationType.EMAIL, expiresAt: { $gt: new Date() } })
+    return Verification.findOne({ recipient: email, type: VerificationType.EMAIL, expiresAt: { $gt: new Date() } });
   }
 
-  async #sentEmail(templateDir: string, recipientMail: string, verificationCode: string, subject: string): Promise<void> {
+  async #sentEmail(
+    templateDir: string,
+    recipientMail: string,
+    verificationCode: string,
+    subject: string,
+  ): Promise<void> {
     const dataSource = { verificationCode };
     const mailer = new Mailer(templateDir, dataSource, { to: recipientMail, subject });
     return mailer.send();

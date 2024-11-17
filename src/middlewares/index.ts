@@ -1,2 +1,2 @@
-export * from "./Log";
-export * from "./Authentications";
+export * from './Log';
+export * from './Authentications';

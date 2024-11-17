@@ -9,12 +9,11 @@ export interface SocialLinkService {
 
 @injectable()
 export class SocialLinkServiceImpl implements SocialLinkService {
-
   insertMany(data: ISocialLink[]) {
     return SocialLink.insertMany(data);
-  };
+  }
 
   findOneById(id: string) {
     return SocialLink.findOne({ _id: id });
-  };
+  }
 }

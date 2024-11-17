@@ -11,7 +11,7 @@ interface IRepository<T extends Document> {
 
 // Implement the generic repository class
 class BaseRepository<T extends Document> implements IRepository<T> {
-  constructor(private model: Model<T>) { }
+  constructor(private model: Model<T>) {}
 
   async create(data: Partial<T>): Promise<T> {
     return await this.model.create(data);

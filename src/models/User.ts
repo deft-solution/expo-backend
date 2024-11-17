@@ -44,7 +44,7 @@ const UserProfileSchema: Schema<UserProfile> = new Schema<UserProfile>({
     required: false,
     default: null,
   },
-})
+});
 
 const UserSchema: Schema<IUser> = new Schema<IUser>(
   {

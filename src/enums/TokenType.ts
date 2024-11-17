@@ -1,4 +1,4 @@
 export enum TokenType {
-  Basic = "Basic",
-  Bearer = "Bearer"
+  Basic = 'Basic',
+  Bearer = 'Bearer',
 }

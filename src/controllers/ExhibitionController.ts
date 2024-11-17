@@ -2,9 +2,7 @@ import express from 'express';
 import { inject, injectable } from 'inversify';
 import { FilterQuery, Types } from 'mongoose';
 
-import {
-  Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT
-} from '../../packages';
+import { Authorization, ContextRequest, Controller, GET, NotFoundError, POST, PUT } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { IExhibitor } from '../models';
 import { ExhibitionService } from '../services';
@@ -14,9 +12,8 @@ import { IResponseList } from '../utils/Paginator';
 @Controller('/exhibition')
 @injectable()
 export class ExhibitionController {
-
   @inject('ExhibitionService')
-  exhibitionService!: ExhibitionService
+  exhibitionService!: ExhibitionService;
 
   @GET('/v1/list')
   @Authorization
@@ -36,15 +33,15 @@ export class ExhibitionController {
       Object.assign(filter, { tags: { $in: tags } });
     }
 
-    const response = await this.exhibitionService.getAllWithPagination({ offset, limit }, filter, { createdAt: 'desc' });
+    const response = await this.exhibitionService.getAllWithPaginationAndFilter({ offset, limit }, filter, {
+      createdAt: 'desc',
+    });
     return response;
   }
 
   @GET('/v1/autocomplete')
   @Authorization
-  async getAllForAutoComplete(
-    @ContextRequest req: express.Request<any, any, IExhibitor>,
-  ): Promise<IExhibitor[]> {
+  async getAllForAutoComplete(@ContextRequest req: express.Request<any, any, IExhibitor>): Promise<IExhibitor[]> {
     const { name } = req.query;
 
     const filter: FilterQuery<IExhibitor> = { isActive: true };
@@ -53,15 +50,13 @@ export class ExhibitionController {
       Object.assign(filter, { name: { $regex: name, $options: 'i' } });
     }
 
-    const response = this.exhibitionService.getAllAutoComplete(filter)
+    const response = this.exhibitionService.getAllAutoComplete(filter);
     return response;
   }
 
   @GET('/v1/:id')
   @Authorization
-  async findExhibitionById(
-    @ContextRequest req: express.Request<any, any, IExhibitor>,
-  ): Promise<IExhibitor> {
+  async findExhibitionById(@ContextRequest req: express.Request<any, any, IExhibitor>): Promise<IExhibitor> {
     const { id } = req.params;
     const response = await this.exhibitionService.findOneById(id);
     if (!response) {
@@ -73,9 +68,7 @@ export class ExhibitionController {
 
   @POST('/v1/create')
   @Authorization
-  async createExhibition(
-    @ContextRequest req: express.Request<any, any, IExhibitor>,
-  ): Promise<IExhibitor> {
+  async createExhibition(@ContextRequest req: express.Request<any, any, IExhibitor>): Promise<IExhibitor> {
     if (req.userId) {
       req.body['createdBy'] = new Types.ObjectId(req.userId);
     }
@@ -85,9 +78,7 @@ export class ExhibitionController {
 
   @PUT('/v1/:id')
   @Authorization
-  async updateExhibition(
-    @ContextRequest req: express.Request<any, any, IExhibitor>,
-  ): Promise<IExhibitor> {
+  async updateExhibition(@ContextRequest req: express.Request<any, any, IExhibitor>): Promise<IExhibitor> {
     const { id } = req.params;
     const response = await this.exhibitionService.findOneByIdAndUpdate(id, req.body);
     if (!response) {

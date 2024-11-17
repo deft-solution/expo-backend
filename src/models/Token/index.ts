@@ -1,7 +1,6 @@
 import { TokenType } from '../../enums/TokenType';
 
 export class AccessToken {
-
   accessToken: string;
 
   expiresIn: Date | number;

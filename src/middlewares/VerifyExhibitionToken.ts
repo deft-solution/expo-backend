@@ -12,14 +12,14 @@ export default async function (req: express.Request, _R: express.Response, next:
     const authorization = req.headers['authorization'] ?? '';
     const [_, token] = authorization.split(' ');
     if (!token) {
-      throw new UnauthorizedError('Missing Provided `Token`.')
+      throw new UnauthorizedError('Missing Provided `Token`.');
     }
-    const payload = await verifyJWTToken(token) as JwtPayload;
+    const payload = (await verifyJWTToken(token)) as JwtPayload;
     const userService = new UserServiceImpl();
     const [verification, user] = await Promise.all([
       Verification.findById(payload.id),
-      userService.findOne({ username: payload.email })
-    ])
+      userService.findOne({ username: payload.email }),
+    ]);
     // User has existed or ID of verification does not existed
     if (user || !verification) {
       throw new UnauthorizedError('User has already register!.', ErrorCode.UserIsExisted);

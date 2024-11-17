@@ -3,18 +3,28 @@ import { inject, injectable } from 'inversify';
 import mongoose, { FilterQuery, Types } from 'mongoose';
 
 import {
-  Authorization, BadRequestError, ContextRequest, Controller, GET, NotFoundError, POST, PUT
+  Authorization,
+  BadRequestError,
+  ContextRequest,
+  Controller,
+  GET,
+  Middleware,
+  MissingParamError,
+  NotFoundError,
+  POST,
+  PUT,
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
-import { IBooth } from '../models/Booth';
+import { BoothTemplateExcel, IBooth } from '../models/Booth';
 import { BoothService, ExhibitionService } from '../services';
 import { Pagination } from '../utils/Pagination';
 import { IResponseList } from '../utils/Paginator';
+import Multer from '../middlewares/multer';
+import { ExcelHelper } from '../helpers/ExcelHelper';
 
 @Controller('/booths')
 @injectable()
 export class BoothController {
-
   @inject('BoothService')
   boothSv!: BoothService;
 
@@ -23,9 +33,7 @@ export class BoothController {
 
   @GET('/v1/list')
   @Authorization
-  async getAllBooths(
-    @ContextRequest request: express.Request,
-  ): Promise<IResponseList<IBooth>> {
+  async getAllBooths(@ContextRequest request: express.Request): Promise<IResponseList<IBooth>> {
     const pagination = new Pagination(request).getParam();
 
     const booths = await this.boothSv.getAllWithPagination(pagination, {}, { createdAt: 'desc' });
@@ -33,12 +41,10 @@ export class BoothController {
   }
 
   @GET('/v1/guest/:eventId')
-  async getAllBoothsByEventID(
-    @ContextRequest request: express.Request,
-  ): Promise<IBooth[]> {
+  async getAllBoothsByEventID(@ContextRequest request: express.Request): Promise<IBooth[]> {
     const { eventId } = request.params;
     if (!mongoose.isValidObjectId(eventId)) {
-      throw new NotFoundError('We don`t have booth for this event yet.')
+      throw new NotFoundError('We don`t have booth for this event yet.');
     }
 
     const booths = await this.boothSv.getAllEventId(eventId);
@@ -47,9 +53,7 @@ export class BoothController {
 
   @GET('/v1/autocomplete')
   @Authorization
-  async getAllBoothsAutoComplete(
-    @ContextRequest request: express.Request,
-  ): Promise<IBooth[]> {
+  async getAllBoothsAutoComplete(@ContextRequest request: express.Request): Promise<IBooth[]> {
     const { name } = request.query;
 
     const filter: FilterQuery<IBooth> = { isActive: true };
@@ -64,9 +68,7 @@ export class BoothController {
 
   @GET('/v1/:id')
   @Authorization
-  async findOneById(
-    @ContextRequest request: express.Request,
-  ): Promise<IBooth> {
+  async findOneById(@ContextRequest request: express.Request): Promise<IBooth> {
     const { id } = request.params;
     const item = await this.boothSv.findOneById(id);
     if (!item) {
@@ -77,9 +79,7 @@ export class BoothController {
 
   @PUT('/v1/:id')
   @Authorization
-  async updateOneById(
-    @ContextRequest request: express.Request<any, any, IBooth>,
-  ): Promise<IBooth> {
+  async updateOneById(@ContextRequest request: express.Request<any, any, IBooth>): Promise<IBooth> {
     const { id } = request.params;
     const item = await this.boothSv.findOneByIdAndUpdate(id, request.body);
     if (!item) {
@@ -90,14 +90,28 @@ export class BoothController {
 
   @POST('/v1/create')
   @Authorization
-  async create(
-    @ContextRequest req: express.Request<any, any, IBooth>,
-  ): Promise<IBooth> {
+  async create(@ContextRequest req: express.Request<any, any, IBooth>): Promise<IBooth> {
     if (req.userId) {
       req.body['createdBy'] = new Types.ObjectId(req.userId);
     }
 
     const booth = await this.boothSv.createTrx(req.body);
     return booth;
+  }
+
+  @POST('/v1/xlsx/upload')
+  @Authorization
+  @Middleware(Multer)
+  async uploadFileExcel(@ContextRequest req: express.Request<any, any, IBooth>) {
+    const file = req.file;
+    if (!file) {
+      throw new MissingParamError('file');
+    }
+
+    const excelHelper = new ExcelHelper('Sheet1');
+    const data = await excelHelper.readFile<BoothTemplateExcel>(file.buffer);
+
+    const result = await this.boothSv.createBatchByTemplateXlsx(data, req.userId as string);
+    return result;
   }
 }

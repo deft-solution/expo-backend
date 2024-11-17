@@ -1,7 +1,7 @@
 import mongoose, { ClientSession } from 'mongoose';
 
 export class TransactionManager {
-  private session!: ClientSession;
+  private session: ClientSession | null = null;
 
   async runs<T>(transactionFn: (session: ClientSession) => Promise<T>) {
     await this.#startSession();
@@ -11,7 +11,6 @@ export class TransactionManager {
 
       return result;
     } catch (error) {
-
       await this.#abortTransaction();
       throw error;
     }

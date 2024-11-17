@@ -12,9 +12,9 @@ export default async function (req: express.Request, _R: express.Response, next:
     const authorization = req.headers['authorization'] ?? '';
     const [bearer, token] = authorization.split(' ');
     if (!token) {
-      throw new UnauthorizedError('Missing Provided `Token`.')
+      throw new UnauthorizedError('Missing Provided `Token`.');
     }
-    const payload = await verifyJWTToken(token) as JwtPayload;
+    const payload = (await verifyJWTToken(token)) as JwtPayload;
     const userService = new UserServiceImpl();
     const user = await userService.findOne({ _id: payload.userId, status: UserStatus.Active });
     if (!user) {
