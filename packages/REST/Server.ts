@@ -5,6 +5,7 @@ import { ServiceContext } from './classes';
 import { HttpMethod, ParamType } from './enums';
 import { pathResolver } from './helpers';
 import { ServiceClass, ServiceFactory, ServiceMethod } from './meta';
+import { DownloadBinaryData, DownloadResource, PDFData } from './responses';
 
 export class ServerContainer {
   static serverClasses: Map<string, ServiceClass> = new Map<string, ServiceClass>();
@@ -76,15 +77,57 @@ export class ServerContainer {
     const handler = async (request: Request, res: Response, next: NextFunction) => {
       try {
         const context = new ServiceContext({ request, response: res, next });
+
         const args = this._resolveParameter(serviceMethod, context) as any;
         const response = await serviceObject[serviceMethod.name](...args);
-        return res.json(response);
+
+        this._sendComplexValue(res, response);
+
       } catch (error) {
         next(error)
       }
     }
 
     this._registerRoute(serviceMethod, handler);
+  }
+
+  private async _sendComplexValue(response: Response, value: any) {
+    if (value instanceof DownloadBinaryData) {
+      return this.sendFile(response, value); // Check type and handle DownloadBinaryData
+    }
+
+    if (value instanceof DownloadResource && value.filePath) {
+      await this.downloadResToPromise(response, value); // Handle DownloadResource with filePath
+      return;
+    }
+
+    if (value instanceof PDFData) {
+      const buffer = Buffer.from(value.data, "binary");
+      const fileName = value.fileName;
+      response.writeHead(200, {
+        "Content-Length": buffer.length,
+        "Content-Type": "application/pdf",
+        'Content-disposition': `attachment;filename="${fileName}"`
+      });
+
+      response.end(buffer);
+      return;
+    }
+
+    // Default case: handle as JSON response
+    response.json(value);
+  }
+
+  private downloadResToPromise(res: Response, value: DownloadResource) {
+    return new Promise((resolve, reject) => {
+      res.download(value.filePath, value.fileName || value.filePath, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(undefined);
+        }
+      });
+    });
   }
 
   private _resolveParameter(serviceMethod: ServiceMethod, context: ServiceContext) {
@@ -149,5 +192,22 @@ export class ServerContainer {
       return (types.indexOf(targetClass) > -1);
     }
     return true;
+  }
+
+  private sendFile(res: Response, value: DownloadBinaryData) {
+    if (value.fileName) {
+      res.writeHead(200, {
+        'Content-Length': value.content.length,
+        'Content-Type': value.mimeType,
+        'Content-disposition': 'attachment;filename=' + value.fileName
+      });
+    }
+    else {
+      res.writeHead(200, {
+        'Content-Length': value.content.length,
+        'Content-Type': value.mimeType
+      });
+    }
+    res.end(value.content);
   }
 }
