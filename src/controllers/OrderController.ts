@@ -37,8 +37,7 @@ export class OrderController {
 
     // Generate the PDF with a timestamped filename
     const pdfBuffer = await pdfHelper.generatePDF(data, { format: 'A4' });
-
-    return new PDFData(pdfBuffer, baseFileName)
+    return new PDFData(pdfBuffer, baseFileName);
   }
 
   @POST('/v1/create')
