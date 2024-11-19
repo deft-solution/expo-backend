@@ -1,18 +1,18 @@
-import { inject, injectable } from 'inversify';
-
-import { BaseService, BaseServiceImpl } from '../base/BaseService';
-import { IOrder, IOrderItem, Order } from '../models';
-import { SerialPrefixService } from './SerialPrefixService';
 import * as express from 'express';
-import { IOrderRequestParams } from '../middlewares/ValidateOrderParam';
-import { BoothService } from './BoothService';
-import { ExpressHelper } from '../helpers/Express';
-import mongoose, { ObjectId } from 'mongoose';
+import { inject, injectable } from 'inversify';
 import { sumBy } from 'lodash';
+import mongoose, { ObjectId } from 'mongoose';
+
 import { BadRequestError } from '../../packages';
+import { BaseService, BaseServiceImpl } from '../base/BaseService';
 import { TransactionManager } from '../base/TransactionManager';
-import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
 import { Currency } from '../enums/Currency';
+import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
+import { ExpressHelper } from '../helpers/Express';
+import { IOrderRequestParams } from '../middlewares/ValidateOrderParam';
+import { IOrder, IOrderItem, Order } from '../models';
+import { BoothService } from './BoothService';
+import { SerialPrefixService } from './SerialPrefixService';
 
 export interface OrderService extends BaseService<IOrder> {
   signOrderIsCompleted: (order: IOrder) => Promise<void>;
@@ -38,7 +38,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
       await this.updateAllReserveBooth(order.id, order.items, session);
-      await this.findOneByIdAndUpdate(order.id, { status: OrderStatus.Completed }, { session });
+      await this.findOneByIdAndUpdate(order.id, { status: OrderStatus.Completed, completedAt: new Date(), }, { session });
     });
   }
   async updateAllReserveBooth(orderId: ObjectId, booths: IOrderItem[], session: mongoose.ClientSession) {

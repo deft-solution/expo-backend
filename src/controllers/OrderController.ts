@@ -3,8 +3,8 @@ import { inject, injectable } from 'inversify';
 import path from 'path';
 
 import {
-  ContextRequest, Controller, DownloadBinaryData, GET, Middleware, NotFoundError, PDFData, POST,
-  PUT
+    ContextRequest, Controller, DownloadBinaryData, GET, Middleware, NotFoundError, PDFData, POST,
+    PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';
@@ -59,7 +59,7 @@ export class OrderController {
     const { orderId } = request.params;
     const order = await this.orderSv.findOne({ _id: orderId, status: { $ne: OrderStatus.Completed } });
     if (!order) {
-      throw new NotFoundError('We dont have this order yet.', ErrorCode.WeDontHaveThisOrderYet);
+      throw new NotFoundError('We don`t have this order yet.', ErrorCode.WeDontHaveThisOrderYet);
     }
     //
     await this.orderSv.signOrderIsCompleted(order);

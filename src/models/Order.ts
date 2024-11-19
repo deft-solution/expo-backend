@@ -26,6 +26,7 @@ export interface IOrder extends Document {
   option: string;
   paymentCard: string;
   //
+  completedAt: Date;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -62,6 +63,7 @@ const OrderSchema = new Schema<IOrder>(
     totalAmount: { type: Number, required: true },
     orderNo: { type: String, required: true, unique: true },
     paymentMethod: { type: String, required: true },
+    completedAt: { type: Date, required: false, default: null },
     currency: {
       type: String,
       required: true,
