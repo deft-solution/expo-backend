@@ -116,7 +116,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       status: OrderStatus.Pending,
       paymentStatus: PaymentStatus.Pending,
       paymentId: param.paymentId,
-      currency: Currency.KHR,
+      currency: Currency.USD,
       createdAt: new Date(),
       items,
     };

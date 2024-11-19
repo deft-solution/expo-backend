@@ -37,7 +37,7 @@ export class PdfHelper {
 
       return pdfBuffer;
     } catch (error) {
-      throw new Error(`Error generating PDF: ${(error as Error).message}`);
+      throw new Error(`${(error as Error).message}`);
     }
   }
 }
