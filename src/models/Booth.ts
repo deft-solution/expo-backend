@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface BoothTemplateExcel {
   'Booth Number': string;
+  'Booth Name': string;
   'Event Name': string;
   'Booth Type': string;
   'External ID': string;
@@ -13,6 +14,7 @@ export interface BoothTemplateExcel {
 
 export interface IBooth extends Document {
   boothNumber: string;
+  boothName: string;
   hall?: string;
   size: string;
   event: mongoose.Types.ObjectId;
@@ -30,6 +32,7 @@ export interface IBooth extends Document {
 export const BoothSchema: Schema = new Schema(
   {
     boothNumber: { type: String, required: true, default: null },
+    boothName: { type: String, required: true, default: null },
     hall: { type: String, required: true, default: null },
     size: { type: String, required: false, default: null },
     mapUrl: { type: String, required: false, default: null },

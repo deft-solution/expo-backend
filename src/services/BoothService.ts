@@ -1,14 +1,14 @@
 import { inject, injectable } from 'inversify';
-import { FilterQuery, ObjectId } from 'mongoose';
+import { FilterQuery } from 'mongoose';
+import { IBoothType } from 'src/models/BoothType';
 
+import { BadRequestError, MissingParamError } from '../../packages';
 import { BaseService, BaseServiceImpl } from '../base/BaseService';
 import { TransactionManager } from '../base/TransactionManager';
 import Booth, { BoothTemplateExcel, IBooth } from '../models/Booth';
 import { IPagination, IResponseList, Paginator } from '../utils/Paginator';
-import { EventService } from './EventService';
-import { BadRequestError, MissingParamError } from '../../packages';
 import { BoothTypeService } from './BoothTypeService';
-import { IBoothType } from 'src/models/BoothType';
+import { EventService } from './EventService';
 
 export interface BoothService extends BaseService<IBooth> {
   createTrx: (data: Partial<IBooth>) => Promise<IBooth>;
@@ -92,7 +92,8 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
         chain = chain.then(async () => {
           const booth = booths[i]; // Access booth by index
           const eventName = booth['Event Name']?.trim() ?? ''; // Trim leading and trailing spaces
-          const boothNumber = booth['Booth Number'];
+          const boothName = booth['Booth Name']?.trim() ?? ''; // Trim leading and trailing spaces
+          const boothNumber = (booth['Booth Number'] as any).result;
           // Find the event by its name
           const event = await this.eventSv.findOneByName(eventName, session);
 
@@ -120,12 +121,13 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
           // Example of booth creation (commented out, but you can include as needed)
           const boothData: Partial<IBooth> = {
             boothNumber,
+            boothName,
             hall: booth.Hall,
             event: event.id,
             boothType: boothType.id,
             createdBy: userId as any,
             price: booth.Price,
-            description: booth.Description,
+            description: (booth.Description as any).result,
             size: booth.Size,
             mapUrl: null,
             externalId: booth['External ID'],
