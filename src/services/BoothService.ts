@@ -93,7 +93,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
           const booth = booths[i]; // Access booth by index
           const eventName = booth['Event Name']?.trim() ?? ''; // Trim leading and trailing spaces
           const boothName = booth['Booth Name']?.trim() ?? ''; // Trim leading and trailing spaces
-          const boothNumber = (booth['Booth Number'] as any).result;
+          const boothNumber = booth['Booth Number'];
           // Find the event by its name
           const event = await this.eventSv.findOneByName(eventName, session);
 
@@ -127,7 +127,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
             boothType: boothType.id,
             createdBy: userId as any,
             price: booth.Price,
-            description: (booth.Description as any).result,
+            description: booth.Description,
             size: booth.Size,
             mapUrl: null,
             externalId: booth['External ID'],
