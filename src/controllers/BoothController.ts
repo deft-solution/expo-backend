@@ -3,8 +3,8 @@ import { inject, injectable } from 'inversify';
 import mongoose, { FilterQuery, Types } from 'mongoose';
 
 import {
-  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, MissingParamError,
-  NotFoundError, POST, PUT
+    Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, MissingParamError,
+    NotFoundError, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { ExcelHelper } from '../helpers/ExcelHelper';
@@ -27,8 +27,19 @@ export class BoothController {
   @Authorization
   async getAllBooths(@ContextRequest request: express.Request): Promise<IResponseList<IBooth>> {
     const pagination = new Pagination(request).getParam();
+    const { eventId, name } = request.query;
 
-    const booths = await this.boothSv.getAllWithPagination(pagination, {}, { createdAt: 'desc' });
+    const filter: FilterQuery<IBooth> = {};
+
+    if (eventId) {
+      Object.assign(filter, { event: eventId });
+    }
+
+    if (name) {
+      Object.assign(filter, { name: { $regex: name, $options: 'i' } });
+    }
+
+    const booths = await this.boothSv.getAllWithPagination(pagination, filter, { createdAt: 'desc' });
     return booths;
   }
 
@@ -39,7 +50,7 @@ export class BoothController {
       throw new NotFoundError('We don`t have booth for this event yet.');
     }
 
-    const booths = await this.boothSv.getAllEventId(eventId);
+    const booths = await this.boothSv.getAllBoothByEventId(eventId);
     return booths;
   }
 

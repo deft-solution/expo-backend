@@ -12,7 +12,7 @@ import { EventService } from './EventService';
 
 export interface BoothService extends BaseService<IBooth> {
   createTrx: (data: Partial<IBooth>) => Promise<IBooth>;
-  getAllEventId: (eventId: string) => Promise<IBooth[]>;
+  getAllBoothByEventId: (eventId: string) => Promise<IBooth[]>;
   createBatchByTemplateXlsx: (booths: BoothTemplateExcel[], userId: string) => Promise<void>;
   getAllWithPagination: (
     pagination: IPagination,
@@ -35,7 +35,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
     super();
   }
 
-  async getAllEventId(eventId: string) {
+  async getAllBoothByEventId(eventId: string) {
     const query = await Booth.find({ event: eventId, isActive: true }).populate('boothType');
     return query;
   }
