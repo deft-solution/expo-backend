@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IBoothType extends Document {
   name: string; // Name of the booth type, e.g., "Standard", "Premium", etc.
-  description: string; // Description of the booth type
+  description: string | null; // Description of the booth type
   price: number; // Price for the booth type
   isActive?: boolean;
   createdAt?: Date;
@@ -17,6 +17,7 @@ export const BoothTypeSchema: Schema = new Schema(
     },
     description: {
       type: String,
+      default: null,
       required: false,
     },
     price: {

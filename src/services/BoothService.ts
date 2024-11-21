@@ -115,6 +115,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
             name: booth['Booth Type'],
             price: booth.Price,
             createdBy: userId as any,
+            description: booth.Description,
           };
           const boothType = await this.boothTypeSv.createBoothTypeIfAbsent(boothTypeData, session);
 
@@ -127,7 +128,6 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
             boothType: boothType.id,
             createdBy: userId as any,
             price: booth.Price,
-            description: booth.Description,
             size: booth.Size,
             mapUrl: null,
             externalId: booth['External ID'],

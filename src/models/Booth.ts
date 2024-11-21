@@ -21,7 +21,6 @@ export interface IBooth extends Document {
   mapUrl: string | null;
   externalId: string;
   isReserved: boolean;
-  description: string | null;
   price: number;
   isActive?: boolean;
   boothType: mongoose.Types.ObjectId;
@@ -38,7 +37,6 @@ export const BoothSchema: Schema = new Schema(
     mapUrl: { type: String, required: false, default: null },
     externalId: { type: String, required: true },
     price: { type: Number, required: false, default: null },
-    description: { type: String, required: false, default: null },
     isReserved: { type: Boolean, required: false, default: false },
     isActive: { type: Boolean, default: true },
     event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
