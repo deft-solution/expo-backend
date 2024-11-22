@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as fs from 'fs';
 import { inject, injectable } from 'inversify';
 import moment from 'moment-timezone';
 import { FilterQuery } from 'mongoose';
