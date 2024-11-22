@@ -1,5 +1,4 @@
 import * as express from 'express';
-import * as fs from 'fs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
 
