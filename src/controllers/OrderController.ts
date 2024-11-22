@@ -1,10 +1,10 @@
 import * as express from 'express';
+import * as fs from 'fs';
 import { inject, injectable } from 'inversify';
 import path from 'path';
 
 import {
-    ContextRequest, Controller, DownloadBinaryData, GET, Middleware, NotFoundError, PDFData, POST,
-    PUT
+  ContextRequest, Controller, GET, Middleware, NotFoundError, PDFData, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';
@@ -33,10 +33,11 @@ export class OrderController {
     const pdfHelper = new PdfHelper(templatePath);
 
     const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
-    const baseFileName = `Order-0001-${timestamp}`;
+    const baseFileName = `Order-0001-${timestamp}.pdf`;
 
     // Generate the PDF with a timestamped filename
     const pdfBuffer = await pdfHelper.generatePDF(data, { format: 'A4' });
+
     return new PDFData(pdfBuffer, baseFileName);
   }
 
