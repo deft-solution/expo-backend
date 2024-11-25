@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 import { Currency } from '../enums/Currency';
-import { OrderStatus, PaymentStatus } from '../enums/Order';
+import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
 
 export interface IOrder extends Document {
   ip: string;
@@ -9,25 +9,21 @@ export interface IOrder extends Document {
   lastName: string;
   phoneNumber: string;
   email: string;
-  companyName: string | null;
-  paymentId: string;
   patentUrl: string | null;
+  companyName: string | null;
   nationality: string | null;
   totalAmount: number;
   currency: Currency;
   orderNo: string;
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
   note: string | null;
   event: mongoose.Types.ObjectId;
   items: IOrderItem[];
-  provider: number;
-  option: string;
-  paymentCard: string;
   //
   completedAt: Date;
-  createdBy: string;
+  createdBy: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,23 +42,31 @@ const orderItemSchema = new Schema<IOrderItem>({
   totalPrice: { type: Number, required: true },
 });
 
+// Reusable enum validator function
+const enumValidator = (enumObject: object) => ({
+  validator: function (value: any) {
+    return !Array.isArray(value) && Object.values(enumObject).includes(value);
+  },
+  message: (props: any) => `${props.value} is not a valid value!`,
+});
+
 const OrderSchema = new Schema<IOrder>(
   {
     ip: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     phoneNumber: { type: String, required: true },
-    option: { type: String, required: true },
-    paymentCard: { type: String, required: true },
-    provider: { type: Number, required: true },
     email: { type: String, required: true },
-    paymentId: { type: String, required: true },
     companyName: { type: String, default: null },
     patentUrl: { type: String, default: null },
     nationality: { type: String, default: null },
     totalAmount: { type: Number, required: true },
     orderNo: { type: String, required: true, unique: true },
-    paymentMethod: { type: String, required: true },
+    paymentMethod: {
+      type: Number,
+      required: true,
+      validate: enumValidator(PaymentMethod),
+    },
     completedAt: { type: Date, required: false, default: null },
     currency: {
       type: String,
@@ -99,7 +103,7 @@ const OrderSchema = new Schema<IOrder>(
     note: { type: String, default: null },
     event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true }, // Assuming 'Event' is another model
     items: { type: [orderItemSchema], required: true },
-    createdBy: { type: String, required: true },
+    createdBy: { type: String, required: false, default: null },
   },
   { timestamps: true },
 ); // This will automatically add createdAt and updatedAt fields

@@ -18,6 +18,7 @@ interface ValidationRules {
   };
   type?: string;
   maxQuantity?: number;
+  enumValues?: any[]; // New field for enum validation
 }
 
 export type ValidationRulesMap<T> = {
@@ -105,6 +106,11 @@ export class GenericParamsChecker<T> {
 
     if (rules.isArray) {
       this.#validateArray(value, fieldName, rules);
+    }
+
+    // Enum validation
+    if (rules.enumValues && !rules.enumValues.includes(value)) {
+      throw new BadRequestError(`'${fieldName}' must be one of the following values`);
     }
   }
 

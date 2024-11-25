@@ -16,6 +16,7 @@ export interface IEvents extends Document {
   createdBy: PopulatedDoc<IUser>;
   createdAt: Date;
   isActive: boolean;
+  maxBoothPerOrder: number; // Updated field name
 }
 
 const EventSchema: Schema<IEvents> = new Schema<IEvents>(
@@ -72,6 +73,11 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'Users',
+    },
+    maxBoothPerOrder: {
+      type: Number,
+      default: 1, // Default value
+      required: true,
     },
   },
   {

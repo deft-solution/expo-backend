@@ -26,7 +26,7 @@ export class PdfHelper {
       const template = await this.loadTemplate();
       const htmlContent = template(data);
 
-      const browser = await puppeteer.launch({ headless: false, });
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 

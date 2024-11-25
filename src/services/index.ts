@@ -9,6 +9,8 @@ import { UserService, UserServiceImpl } from './UserService';
 import { VerificationService, VerificationServiceImpl } from './VerificationSerivce';
 import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
 import { OrderServiceImpl, OrderService } from './OrderService';
+import { SitAPIServiceImpl, SitAPIService } from './SitAPIService';
+import { BakongService, BakongServiceImpl } from './BakongTokenService';
 
 REST.register('BabyService', BabyServiceImpl);
 REST.register('UserService', UserServiceImpl);
@@ -20,6 +22,8 @@ REST.register('BoothTypeService', BoothTypeServiceImpl);
 REST.register('BoothService', BoothServiceImpl);
 REST.register('SerialPrefixService', SerialPrefixServiceImpl);
 REST.register('OrderService', OrderServiceImpl);
+REST.register('SitAPIService', SitAPIServiceImpl);
+REST.register('BakongService', BakongServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -42,4 +46,8 @@ export {
   SerialPrefixServiceImpl,
   OrderService,
   OrderServiceImpl,
+  SitAPIService,
+  SitAPIServiceImpl,
+  BakongService,
+  BakongServiceImpl,
 };

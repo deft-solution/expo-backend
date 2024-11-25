@@ -20,4 +20,6 @@ export enum ErrorCode {
 
   // Order
   WeDontHaveThisOrderYet = 60000,
+  TheOrderhasSupersededTheMaxValue = 60001,
+  OrededBoothHasAlredyReserved = 60002,
 }

@@ -9,12 +9,14 @@ import { TransactionManager } from '../base/TransactionManager';
 import { Currency } from '../enums/Currency';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
 import { ExpressHelper } from '../helpers/Express';
-import { IOrderRequestParams } from '../middlewares/ValidateOrderParam';
+import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
 import { IOrder, IOrderItem, Order } from '../models';
 import { BoothService } from './BoothService';
 import { SerialPrefixService } from './SerialPrefixService';
+import { ErrorCode } from '../enums/ErrorCode';
 
 export interface OrderService extends BaseService<IOrder> {
+  calucateAmountByEvent: (event: string, booths: IOrderBooths[]) => Promise<number>;
   signOrderIsCompleted: (order: IOrder) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }
@@ -38,7 +40,11 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
       await this.updateAllReserveBooth(order.id, order.items, session);
-      await this.findOneByIdAndUpdate(order.id, { status: OrderStatus.Completed, completedAt: new Date(), }, { session });
+      await this.findOneByIdAndUpdate(
+        order.id,
+        { status: OrderStatus.Completed, completedAt: new Date() },
+        { session },
+      );
     });
   }
   async updateAllReserveBooth(orderId: ObjectId, booths: IOrderItem[], session: mongoose.ClientSession) {
@@ -106,16 +112,11 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       email: param.email,
       companyName: param.companyName,
       nationality: param.nationality,
-      createdBy: param.userId,
       paymentMethod: PaymentMethod.QRCode,
-      paymentCard: param.paymentCard,
-      provider: param.provider,
-      option: param.option,
       phoneNumber: param.phoneNumber,
       note: param.note ?? null,
       status: OrderStatus.Pending,
       paymentStatus: PaymentStatus.Pending,
-      paymentId: param.paymentId,
       currency: Currency.USD,
       createdAt: new Date(),
       items,
@@ -130,5 +131,30 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     });
 
     return response;
+  }
+
+  async calucateAmountByEvent(event: string, booths: IOrderBooths[]) {
+    // Initialize total amount
+    let totalAmount = 0;
+
+    for (const booth of booths) {
+      const boothDetail = await this.boothSv.findOne({ event, _id: booth.boothId, isActive: true });
+      if (!boothDetail) {
+        throw new BadRequestError(`Booth with ID ${booth.boothId} does not exist.`, ErrorCode.BoothDoesNotExisted);
+      }
+
+      if (boothDetail.isReserved) {
+        throw new BadRequestError(
+          `Booth with ID ${booth.boothId} is already reserved and cannot be ordered.`,
+          ErrorCode.OrededBoothHasAlredyReserved,
+        );
+      }
+
+      // Calculate the amount for the current booth
+      const boothAmount = booth.quantity * boothDetail.price;
+      totalAmount += boothAmount;
+    }
+
+    return totalAmount;
   }
 }
