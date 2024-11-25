@@ -15,6 +15,16 @@ export interface ICalculatedResponse {
   size: string;
 }
 
+export interface ICalculatedResponse {
+  boothId: string;
+  price: number;
+  convertedPrice: number;
+  quantity: number;
+  originCurrency: Currency;
+  boothName: string;
+  boothTypeName: string;
+}
+
 export interface IOrder extends Document {
   ip: string;
   firstName: string;
