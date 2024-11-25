@@ -3,20 +3,22 @@ import { inject, injectable } from 'inversify';
 import { sumBy } from 'lodash';
 import mongoose, { ObjectId } from 'mongoose';
 
-import { BadRequestError } from '../../packages';
+import { BadRequestError, NotFoundError } from '../../packages';
 import { BaseService, BaseServiceImpl } from '../base/BaseService';
 import { TransactionManager } from '../base/TransactionManager';
 import { Currency } from '../enums/Currency';
+import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
+import { CurrencyHelper } from '../helpers/CurrencyConverter';
 import { ExpressHelper } from '../helpers/Express';
 import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
-import { IOrder, IOrderItem, Order } from '../models';
+import { ICalculatedResponse, IOrder, IOrderItem, Order } from '../models';
 import { BoothService } from './BoothService';
+import { BoothTypeService } from './BoothTypeService';
 import { SerialPrefixService } from './SerialPrefixService';
-import { ErrorCode } from '../enums/ErrorCode';
 
 export interface OrderService extends BaseService<IOrder> {
-  calucateAmountByEvent: (event: string, booths: IOrderBooths[]) => Promise<number>;
+  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency,) => Promise<any>;
   signOrderIsCompleted: (order: IOrder) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }
@@ -30,6 +32,9 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
 
   @inject('BoothService')
   boothSv!: BoothService;
+
+  @inject('BoothTypeService')
+  boothTypeSv!: BoothTypeService;
 
   constructor() {
     super();
@@ -47,6 +52,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       );
     });
   }
+
   async updateAllReserveBooth(orderId: ObjectId, booths: IOrderItem[], session: mongoose.ClientSession) {
     // Use Promise.all to wait for all booth update operations
     return await Promise.all(
@@ -66,7 +72,10 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     const ip = ExpressHelper.getClientIp(request);
     const booths = param.booths;
 
-    // Validate and create order items
+    const currencyHelper = new CurrencyHelper();
+    const targetCurrency = param.currency; // Default to USD if no currency is provided.
+
+    // Validate and create order items with currency conversion
     const items: IOrderItem[] = await Promise.all(
       booths.map(async (booth): Promise<IOrderItem> => {
         // Check if boothId is a valid ObjectId
@@ -89,12 +98,24 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
           throw new BadRequestError(`Booth with ID ${booth.boothId} is already reserved`);
         }
 
+        // Get booth type for currency details
+        const boothType = await this.boothTypeSv.findOne({ _id: existingBooth.boothType });
+        if (!boothType) {
+          throw new NotFoundError('Booth Type does not exist');
+        }
+
+        // Perform currency conversion
+        const convertedPrice = currencyHelper.convertCurrency(existingBooth.price, boothType.currency, targetCurrency);
+
         // Create and return the order item
         return {
           boothId: booth.boothId as any,
           quantity: booth.quantity,
-          unitPrice: existingBooth.price,
-          totalPrice: existingBooth.price * booth.quantity,
+          price: boothType.price,
+          unitPrice: convertedPrice,
+          totalPrice: convertedPrice * booth.quantity,
+          currency: targetCurrency,
+          boothTypeCurrency: boothType.currency,
         };
       }),
     );
@@ -112,12 +133,12 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       email: param.email,
       companyName: param.companyName,
       nationality: param.nationality,
-      paymentMethod: PaymentMethod.QRCode,
+      paymentMethod: param.paymentMethod,
       phoneNumber: param.phoneNumber,
       note: param.note ?? null,
       status: OrderStatus.Pending,
       paymentStatus: PaymentStatus.Pending,
-      currency: Currency.USD,
+      currency: targetCurrency,
       createdAt: new Date(),
       items,
     };
@@ -133,28 +154,53 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     return response;
   }
 
-  async calucateAmountByEvent(event: string, booths: IOrderBooths[]) {
+  async calculatedAmountByEvent(event: string, booths: IOrderBooths[], currency: Currency): Promise<{
+    totalAmount: number;
+    booths: ICalculatedResponse[];
+    currency: Currency;
+  }> {
     // Initialize total amount
     let totalAmount = 0;
+    const boothDetailsWithPrices: ICalculatedResponse[] = [];
 
     for (const booth of booths) {
       const boothDetail = await this.boothSv.findOne({ event, _id: booth.boothId, isActive: true });
       if (!boothDetail) {
         throw new BadRequestError(`Booth with ID ${booth.boothId} does not exist.`, ErrorCode.BoothDoesNotExisted);
       }
-
-      if (boothDetail.isReserved) {
-        throw new BadRequestError(
-          `Booth with ID ${booth.boothId} is already reserved and cannot be ordered.`,
-          ErrorCode.OrededBoothHasAlredyReserved,
-        );
+      const bootType = await this.boothTypeSv.findOne({ _id: boothDetail.boothType });
+      if (!bootType) {
+        throw new NotFoundError('Booth Type does not existed');
       }
 
+      if (boothDetail.isReserved) {
+        const message = `Booth with ID ${booth.boothId} is already reserved and cannot be ordered.`;
+        throw new BadRequestError(message, ErrorCode.OrderedBoothHasAlreadyReserved);
+      }
+
+      // Perform currency conversion
+      const convertedPrice = new CurrencyHelper().convertCurrency(boothDetail.price, bootType.currency, currency);
+
       // Calculate the amount for the current booth
-      const boothAmount = booth.quantity * boothDetail.price;
+      const boothAmount = booth.quantity * convertedPrice;
       totalAmount += boothAmount;
+
+      // Add booth details with converted price
+      boothDetailsWithPrices.push({
+        boothId: booth.boothId,
+        price: boothDetail.price,
+        boothName: boothDetail.boothName,
+        boothTypeName: bootType.name,
+        convertedPrice,
+        originCurrency: bootType.currency,
+        quantity: booth.quantity,
+      });
     }
 
-    return totalAmount;
+    return {
+      totalAmount,
+      booths: boothDetailsWithPrices,
+      currency,
+    };
   }
 }

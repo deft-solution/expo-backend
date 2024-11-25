@@ -1,16 +1,20 @@
 import * as express from 'express';
-import { GenericParamsChecker, ValidationRulesMap } from '../helpers/ValidationParamHelper';
+
 import { MAX_QUANTITY } from '../contants/Order';
+import { Currency } from '../enums/Currency';
 import { PaymentMethod } from '../enums/Payment';
+import { GenericParamsChecker, ValidationRulesMap } from '../helpers/ValidationParamHelper';
 
 // Define the interface
 export interface IOrderedCalculated {
   event: string;
+  currency: Currency;
   booths: IOrderBooths[];
 }
 
 export interface IOrderRequestParams {
-  event: string; // Machine is represented as an ObjectId in string format
+  currency: Currency;
+  event: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
@@ -28,13 +32,14 @@ export interface IOrderBooths {
   boothId: string;
 }
 
-export function validateCalucatedParam(
+export function validateCalculatedParam(
   req: express.Request<any, any, IOrderedCalculated>,
   _R: express.Response,
   next: express.NextFunction,
 ) {
   try {
     const rules: ValidationRulesMap<IOrderedCalculated> = {
+      currency: { isRequired: true, type: 'string', enumValues: Object.values(Currency) },
       event: { isRequired: true, isObjectId: true, type: 'string' },
       booths: {
         isArray: true,
@@ -64,6 +69,7 @@ export function validateOrderParam(
 ) {
   try {
     const rules: ValidationRulesMap<IOrderRequestParams> = {
+      currency: { isRequired: true, type: 'string', enumValues: Object.values(Currency) },
       event: { isRequired: true, isObjectId: true, type: 'string' },
       firstName: { isRequired: true, type: 'string' },
       lastName: { isRequired: true, type: 'string' },

@@ -3,6 +3,16 @@ import mongoose, { Document, Schema } from 'mongoose';
 import { Currency } from '../enums/Currency';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
 
+export interface ICalculatedResponse {
+  boothId: string;
+  price: number;
+  convertedPrice: number;
+  quantity: number;
+  originCurrency: Currency;
+  boothName: string;
+  boothTypeName: string;
+}
+
 export interface IOrder extends Document {
   ip: string;
   firstName: string;
@@ -31,16 +41,12 @@ export interface IOrder extends Document {
 export interface IOrderItem {
   boothId: mongoose.Types.ObjectId; // Optional field for referencing booths
   quantity: number;
+  price: number;
+  currency: Currency;
+  boothTypeCurrency: Currency;
   unitPrice: number;
   totalPrice: number; // quantity * unitPrice
 }
-
-const orderItemSchema = new Schema<IOrderItem>({
-  boothId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booth', required: true }, // Assuming 'Booth' is another model
-  quantity: { type: Number, required: true },
-  unitPrice: { type: Number, required: true },
-  totalPrice: { type: Number, required: true },
-});
 
 // Reusable enum validator function
 const enumValidator = (enumObject: object) => ({
@@ -48,6 +54,24 @@ const enumValidator = (enumObject: object) => ({
     return !Array.isArray(value) && Object.values(enumObject).includes(value);
   },
   message: (props: any) => `${props.value} is not a valid value!`,
+});
+
+const orderItemSchema = new Schema<IOrderItem>({
+  boothId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booth', required: true }, // Assuming 'Booth' is another model
+  quantity: { type: Number, required: true },
+  unitPrice: { type: Number, required: true },
+  price: { type: Number, required: true },
+  totalPrice: { type: Number, required: true },
+  currency: {
+    type: String,
+    required: true,
+    validate: enumValidator(Currency),
+  },
+  boothTypeCurrency: {
+    type: String,
+    required: true,
+    validate: enumValidator(Currency),
+  },
 });
 
 const OrderSchema = new Schema<IOrder>(

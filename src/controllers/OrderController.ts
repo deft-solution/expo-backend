@@ -1,32 +1,21 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
+import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization,
-  BadRequestError,
-  ContextRequest,
-  Controller,
-  GET,
-  Middleware,
-  NotFoundError,
-  PDFData,
-  POST,
-  PUT,
+  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
+  PDFData, POST, PUT
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated,
-  IOrderRequestParams,
-  validateCalucatedParam,
-  validateOrderParam,
+  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
 } from '../middlewares/ValidateOrderParam';
+import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
 import { Pagination } from '../utils/Pagination';
-import { FilterQuery } from 'mongoose';
-import { IOrder } from '../models/Order';
 
 @Controller('/orders')
 @injectable()
@@ -38,7 +27,7 @@ export class OrderController {
   orderSv!: OrderService;
 
   @POST('/v1/calculated')
-  @Middleware([validateCalucatedParam])
+  @Middleware([validateCalculatedParam])
   async calculatedOrder(@ContextRequest request: express.Request<any, any, IOrderedCalculated>) {
     const body = request.body;
 
@@ -49,22 +38,27 @@ export class OrderController {
 
     if (body.booths.length > event.maxBoothPerOrder) {
       const message = `The number of selected booths (${body.booths.length}) exceeds the maximum allowed (${event.maxBoothPerOrder}).`;
-      throw new BadRequestError(message, ErrorCode.TheOrderhasSupersededTheMaxValue);
+      throw new BadRequestError(message, ErrorCode.TheOrderHasSupersededTheMaxValue);
     }
-    const totalAmount = await this.orderSv.calucateAmountByEvent(body.event, body.booths);
-    return { totalAmount };
+
+    const order = await this.orderSv.calculatedAmountByEvent(body.event, body.booths, body.currency);
+    return order;
   }
 
   @GET('/v1/admin/list')
   @Authorization
   async getAllOrderWithPagination(@ContextRequest request: express.Request<any, any, IOrderRequestParams>) {
     const pagination = new Pagination(request).getParam();
-    const { oderNo } = request.query;
+    const { orderNo, eventId } = request.query;
 
     const filter: FilterQuery<IOrder> = {};
 
-    if (oderNo) {
-      Object.assign(filter, { oderNo: { $regex: oderNo, $options: 'i' } });
+    if (orderNo) {
+      Object.assign(filter, { orderNo: { $regex: orderNo, $options: 'i' } });
+    }
+
+    if (eventId) {
+      Object.assign(filter, { event: eventId });
     }
 
     const populateKeys = ['event', 'items.boothId'];
@@ -80,9 +74,10 @@ export class OrderController {
   @GET('/v1/:orderNo/pdf/receipts')
   async getReceiptOrder(@ContextRequest request: express.Request<any, any, IOrderRequestParams>) {
     const { orderNo } = request.params;
+
     const order = await this.orderSv.findOne({ orderNo: orderNo });
     if (!order) {
-      throw new NotFoundError('This order does not eixsted.!');
+      throw new NotFoundError('This order does not existed.!');
     }
 
     const data = {

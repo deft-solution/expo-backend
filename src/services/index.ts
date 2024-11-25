@@ -1,16 +1,17 @@
 import { REST } from '../../packages';
 import { BabyService, BabyServiceImpl } from './BabyService';
+import { BakongService, BakongServiceImpl } from './BakongTokenService';
 import { BoothService, BoothServiceImpl } from './BoothService';
 import { BoothTypeService, BoothTypeServiceImpl } from './BoothTypeService';
 import { EventService, EventServiceImpl } from './EventService';
 import { ExhibitionService, ExhibitionServiceImpl } from './ExhibitionService';
+import { OrderService, OrderServiceImpl } from './OrderService';
+import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
+import { SitAPIService, SitAPIServiceImpl } from './SitAPIService';
 import { SocialLinkService, SocialLinkServiceImpl } from './SocialLinkService';
+import { TransactionService, TransactionServiceImpl } from './TransactionService';
 import { UserService, UserServiceImpl } from './UserService';
 import { VerificationService, VerificationServiceImpl } from './VerificationSerivce';
-import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
-import { OrderServiceImpl, OrderService } from './OrderService';
-import { SitAPIServiceImpl, SitAPIService } from './SitAPIService';
-import { BakongService, BakongServiceImpl } from './BakongTokenService';
 
 REST.register('BabyService', BabyServiceImpl);
 REST.register('UserService', UserServiceImpl);
@@ -24,6 +25,7 @@ REST.register('SerialPrefixService', SerialPrefixServiceImpl);
 REST.register('OrderService', OrderServiceImpl);
 REST.register('SitAPIService', SitAPIServiceImpl);
 REST.register('BakongService', BakongServiceImpl);
+REST.register('TransactionService', TransactionServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -50,4 +52,6 @@ export {
   SitAPIServiceImpl,
   BakongService,
   BakongServiceImpl,
+  TransactionService,
+  TransactionServiceImpl,
 };
