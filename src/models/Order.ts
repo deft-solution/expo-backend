@@ -23,6 +23,7 @@ export interface ICalculatedResponse {
   originCurrency: Currency;
   boothName: string;
   boothTypeName: string;
+  size: string;
 }
 
 export interface IOrder extends Document {
