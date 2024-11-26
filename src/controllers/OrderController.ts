@@ -112,15 +112,4 @@ export class OrderController {
     const order = await this.orderSv.createOrder(body, request);
     return order;
   }
-
-  @PUT('/v1/:orderId/completed')
-  async orderIsCompleted(@ContextRequest request: express.Request<any, any, any>) {
-    const { orderId } = request.params;
-    const order = await this.orderSv.findOne({ _id: orderId, status: { $ne: OrderStatus.Completed } });
-    if (!order) {
-      throw new NotFoundError('We don`t have this order yet.', ErrorCode.WeDontHaveThisOrderYet);
-    }
-    //
-    await this.orderSv.signOrderIsCompleted(order);
-  }
 }

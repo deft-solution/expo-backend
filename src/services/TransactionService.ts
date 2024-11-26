@@ -41,10 +41,7 @@ export class TransactionServiceImpl extends BaseServiceImpl<ITransaction> {
       paymentInfo,
       paymentTimestamp: new Date(),
     };
-    const transaction = await Transaction.findByIdAndUpdate(trxId, info, {
-      session,
-      new: true,
-    });
+    const transaction = await Transaction.findByIdAndUpdate(trxId, info, { session, new: true, });
     return transaction;
   }
 

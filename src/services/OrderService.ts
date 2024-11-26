@@ -1,25 +1,29 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { sumBy } from 'lodash';
+import moment from 'moment';
 import mongoose, { ObjectId } from 'mongoose';
+import { AccountTransactionData } from 'src/models/SitAPI';
 
 import { BadRequestError, NotFoundError } from '../../packages';
 import { BaseService, BaseServiceImpl } from '../base/BaseService';
 import { TransactionManager } from '../base/TransactionManager';
 import { Currency } from '../enums/Currency';
 import { ErrorCode } from '../enums/ErrorCode';
-import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
+import { OrderStatus, PaymentStatus } from '../enums/Order';
 import { CurrencyHelper } from '../helpers/CurrencyConverter';
 import { ExpressHelper } from '../helpers/Express';
 import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
 import { ICalculatedResponse, IOrder, IOrderItem, Order } from '../models';
+import { IBooth } from '../models/Booth';
 import { BoothService } from './BoothService';
 import { BoothTypeService } from './BoothTypeService';
+import { EmailService, EmailServiceImpl } from './EmailService';
 import { SerialPrefixService } from './SerialPrefixService';
 
 export interface OrderService extends BaseService<IOrder> {
   calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency) => Promise<any>;
-  signOrderIsCompleted: (order: IOrder) => Promise<void>;
+  signOrderIsCompleted: (order: IOrder, paymentInfo: AccountTransactionData) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }
 
@@ -29,6 +33,9 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
 
   @inject('SerialPrefixService')
   prefixSv!: SerialPrefixService;
+
+  @inject('EmailService')
+  emailSv!: EmailService;
 
   @inject('BoothService')
   boothSv!: BoothService;
@@ -40,16 +47,18 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     super();
   }
 
-  async signOrderIsCompleted(order: IOrder) {
+  async signOrderIsCompleted(order: IOrder, paymentInfo: AccountTransactionData) {
     const transactionManager = new TransactionManager();
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
+
       await this.updateAllReserveBooth(order.id, order.items, session);
       await this.findOneByIdAndUpdate(
         order.id,
         { status: OrderStatus.Completed, completedAt: new Date() },
         { session },
       );
+      await this.sentEmail(order.id, paymentInfo)
     });
   }
 
@@ -207,5 +216,38 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       booths: boothDetailsWithPrices,
       currency,
     };
+  }
+
+  async sentEmail(orderId: string, paymentInfo: AccountTransactionData) {
+    const order = await Order.findOne({ _id: orderId }).populate(['items.boothId']);
+    if (!order) {
+      return;
+    }
+
+    const booths = order.items.map((item) => {
+      const booth = (item.boothId as any);
+      const boothName = booth.boothName;
+      const boothSize = booth.size;
+
+      return {
+        name: `${boothName} (${boothSize})`,
+        price: `${order.currency} ${item.unitPrice}`,
+        quantity: item.quantity,
+      }
+    });
+    const customerName = [order.firstName, order.lastName].join(' ');
+
+    const dataSource = {
+      orderNo: order.orderNo,
+      customerName,
+      totalAmount: `${order.currency} ${order.totalAmount}`,
+      year: new Date().getFullYear(),
+      paymentTime: moment(paymentInfo.acknowledgedDateMs).format('DD MMM yyyy hh:mm A'),
+      booths,
+    }
+
+    const templateDir = '/emails/success-order.html';
+    const subject = `Cambodia Trade Expo - Here's your receipt for ${customerName}`
+    await new EmailServiceImpl().sentEmail(templateDir, order.email, dataSource, subject)
   }
 }

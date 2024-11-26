@@ -3,6 +3,7 @@ import { BabyService, BabyServiceImpl } from './BabyService';
 import { BakongService, BakongServiceImpl } from './BakongTokenService';
 import { BoothService, BoothServiceImpl } from './BoothService';
 import { BoothTypeService, BoothTypeServiceImpl } from './BoothTypeService';
+import { EmailService, EmailServiceImpl } from './EmailService';
 import { EventService, EventServiceImpl } from './EventService';
 import { ExhibitionService, ExhibitionServiceImpl } from './ExhibitionService';
 import { OrderService, OrderServiceImpl } from './OrderService';
@@ -26,6 +27,7 @@ REST.register('OrderService', OrderServiceImpl);
 REST.register('SitAPIService', SitAPIServiceImpl);
 REST.register('BakongService', BakongServiceImpl);
 REST.register('TransactionService', TransactionServiceImpl);
+REST.register('EmailService', EmailServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -54,4 +56,6 @@ export {
   BakongServiceImpl,
   TransactionService,
   TransactionServiceImpl,
+  EmailService,
+  EmailServiceImpl,
 };

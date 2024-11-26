@@ -8,6 +8,7 @@ export default class Mailer<T extends Object> {
   dataSource: T;
   templateDir: string;
   options: Mail.Options;
+  attachments: Mail.Attachment[];
 
   private readonly _email: string | undefined = process.env.MAIL_USER;
   private readonly _password: string | undefined = process.env.MAIL_PASSWORD;
@@ -20,7 +21,7 @@ export default class Mailer<T extends Object> {
     return path.join(__dirname, '..', this._templateDir, this.templateDir);
   }
 
-  constructor(mailTemplateDir: string, dataSource: T, options: Mail.Options) {
+  constructor(mailTemplateDir: string, dataSource: T, options: Mail.Options, attachments: Mail.Attachment[] = []) {
     if (!this._email) {
       throw new Error('Missing MAIL_USER');
     }
@@ -31,6 +32,7 @@ export default class Mailer<T extends Object> {
     this.options = options;
     this.dataSource = dataSource;
     this.templateDir = mailTemplateDir;
+    this.attachments = attachments;
   }
 
   transporter() {
@@ -46,6 +48,8 @@ export default class Mailer<T extends Object> {
   async send() {
     try {
       this.options.html = this._compileHTMLTemplate();
+      this.options.attachments = this.attachments;
+      //
       await this.transporter().sendMail(this.options);
       console.log('Email sent successfully.');
     } catch (error: any) {

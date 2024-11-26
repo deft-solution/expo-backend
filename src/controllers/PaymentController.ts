@@ -2,7 +2,9 @@ import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { ClientSession } from 'mongoose';
 
-import { BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST } from '../../packages';
+import {
+  BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST
+} from '../../packages';
 import { TransactionManager } from '../base/TransactionManager';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';
@@ -81,7 +83,7 @@ export class PaymentController {
     const paymentData = bakong.data;
     const result = await new TransactionManager().runs(async (session: ClientSession) => {
       const result = await this.transactionSv.singTransactionIsCompleted(transaction.id, paymentData, session);
-      await this.orderSv.signOrderIsCompleted(order);
+      await this.orderSv.signOrderIsCompleted(order, paymentData);
       return result;
     });
 
