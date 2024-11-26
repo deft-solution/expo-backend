@@ -18,7 +18,7 @@ import { BoothTypeService } from './BoothTypeService';
 import { SerialPrefixService } from './SerialPrefixService';
 
 export interface OrderService extends BaseService<IOrder> {
-  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency,) => Promise<any>;
+  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency) => Promise<any>;
   signOrderIsCompleted: (order: IOrder) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }
@@ -154,7 +154,11 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     return response;
   }
 
-  async calculatedAmountByEvent(event: string, booths: IOrderBooths[], currency: Currency): Promise<{
+  async calculatedAmountByEvent(
+    event: string,
+    booths: IOrderBooths[],
+    currency: Currency,
+  ): Promise<{
     totalAmount: number;
     booths: ICalculatedResponse[];
     currency: Currency;
@@ -194,6 +198,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
         convertedPrice,
         originCurrency: bootType.currency,
         quantity: booth.quantity,
+        size: boothDetail.size,
       });
     }
 

@@ -2,9 +2,7 @@ import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { ClientSession } from 'mongoose';
 
-import {
-  BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST
-} from '../../packages';
+import { BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST } from '../../packages';
 import { TransactionManager } from '../base/TransactionManager';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';
@@ -32,7 +30,7 @@ export class PaymentController {
     const ip = ExpressHelper.getClientIp(request);
     const { orderId } = request.body;
 
-    const order = await this.orderSv.findOne({ _id: orderId, status: OrderStatus.Pending, });
+    const order = await this.orderSv.findOne({ _id: orderId, status: OrderStatus.Pending });
     if (!order) {
       throw new NotFoundError('We don`t have this order yet.!');
     }
@@ -83,16 +81,17 @@ export class PaymentController {
     const paymentData = bakong.data;
     const result = await new TransactionManager().runs(async (session: ClientSession) => {
       const result = await this.transactionSv.singTransactionIsCompleted(transaction.id, paymentData, session);
-      await this.orderSv.signOrderIsCompleted(order.id);
+      await this.orderSv.signOrderIsCompleted(order);
       return result;
     });
 
     const response = {
       orderId: transaction.order,
       transactionNo: transaction.transactionNo,
+      sender: paymentData.externalRef,
       createdAt: transaction.createdAt,
       amount: transaction.amount,
-      paymentTimestamp: transaction.paymentTimestamp,
+      paymentTimestamp: result.paymentTimestamp,
       currency: result.currency,
       status: result.status,
     };
