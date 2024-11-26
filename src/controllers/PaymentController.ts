@@ -2,7 +2,9 @@ import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { ClientSession } from 'mongoose';
 
-import { BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST } from '../../packages';
+import {
+  BadRequestError, ContextRequest, Controller, Middleware, NotFoundError, POST
+} from '../../packages';
 import { TransactionManager } from '../base/TransactionManager';
 import { ErrorCode } from '../enums/ErrorCode';
 import { OrderStatus } from '../enums/Order';

@@ -15,6 +15,7 @@ import { CurrencyHelper } from '../helpers/CurrencyConverter';
 import { ExpressHelper } from '../helpers/Express';
 import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
 import { ICalculatedResponse, IOrder, IOrderItem, Order } from '../models';
+import { IBooth } from '../models/Booth';
 import { BoothService } from './BoothService';
 import { BoothTypeService } from './BoothTypeService';
 import { EmailService, EmailServiceImpl } from './EmailService';
@@ -67,6 +68,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     const transactionManager = new TransactionManager();
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
+
       await this.updateAllReserveBooth(order.id, order.items, session);
       await this.findOneByIdAndUpdate(
         order.id,

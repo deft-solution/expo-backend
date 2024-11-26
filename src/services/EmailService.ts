@@ -1,8 +1,6 @@
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 
 import Mailer from '../configs/Mailer';
-import { Order } from '../models';
-import { OrderService } from './OrderService';
 
 export interface EmailService {
   sentEmail: <T extends Object>(
