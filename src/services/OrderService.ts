@@ -51,14 +51,17 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     const transactionManager = new TransactionManager();
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
-
       await this.updateAllReserveBooth(order.id, order.items, session);
       await this.findOneByIdAndUpdate(
         order.id,
-        { status: OrderStatus.Completed, completedAt: new Date() },
+        {
+          status: OrderStatus.Completed,
+          paymentStatus: PaymentStatus.Completed,
+          completedAt: paymentInfo.acknowledgedDateMs,
+        },
         { session },
       );
-      await this.sentEmail(order.id, paymentInfo)
+      await this.sentEmail(order.id, paymentInfo);
     });
   }
 
@@ -225,7 +228,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     }
 
     const booths = order.items.map((item) => {
-      const booth = (item.boothId as any);
+      const booth = item.boothId as any;
       const boothName = booth.boothName;
       const boothSize = booth.size;
 
@@ -233,7 +236,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
         name: `${boothName} (${boothSize})`,
         price: `${order.currency} ${item.unitPrice}`,
         quantity: item.quantity,
-      }
+      };
     });
     const customerName = [order.firstName, order.lastName].join(' ');
 
@@ -244,10 +247,10 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       year: new Date().getFullYear(),
       paymentTime: moment(paymentInfo.acknowledgedDateMs).format('DD MMM yyyy hh:mm A'),
       booths,
-    }
+    };
 
     const templateDir = '/emails/success-order.html';
-    const subject = `Cambodia Trade Expo - Here's your receipt for ${customerName}`
-    await new EmailServiceImpl().sentEmail(templateDir, order.email, dataSource, subject)
+    const subject = `Cambodia Trade Expo - Here's your receipt for ${customerName}`;
+    await new EmailServiceImpl().sentEmail(templateDir, order.email, dataSource, subject);
   }
 }

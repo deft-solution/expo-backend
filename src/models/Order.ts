@@ -133,6 +133,16 @@ const OrderSchema = new Schema<IOrder>(
   { timestamps: true },
 ); // This will automatically add createdAt and updatedAt fields
 
+OrderSchema.virtual('payments', {
+  ref: 'Transaction',
+  localField: '_id',
+  foreignField: 'order',
+});
+
+// Ensure virtual fields are included when converting to JSON
+OrderSchema.set('toJSON', { virtuals: true });
+OrderSchema.set('toObject', { virtuals: true });
+
 // Create the Mongoose model
 const Order = mongoose.model<IOrder>('Order', OrderSchema);
 export { Order };

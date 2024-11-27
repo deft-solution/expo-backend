@@ -4,14 +4,23 @@ import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
-  PDFData, POST, PUT
+  Authorization,
+  BadRequestError,
+  ContextRequest,
+  Controller,
+  GET,
+  Middleware,
+  NotFoundError,
+  PDFData,
+  POST,
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
-import { OrderStatus } from '../enums/Order';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
+  IOrderedCalculated,
+  IOrderRequestParams,
+  validateCalculatedParam,
+  validateOrderParam,
 } from '../middlewares/ValidateOrderParam';
 import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
@@ -49,7 +58,7 @@ export class OrderController {
   @Authorization
   async getAllOrderWithPagination(@ContextRequest request: express.Request<any, any, IOrderRequestParams>) {
     const pagination = new Pagination(request).getParam();
-    const { orderNo, eventId } = request.query;
+    const { orderNo, eventId, status } = request.query;
 
     const filter: FilterQuery<IOrder> = {};
 
@@ -61,7 +70,11 @@ export class OrderController {
       Object.assign(filter, { event: eventId });
     }
 
-    const populateKeys = ['event', 'items.boothId'];
+    if (status) {
+      Object.assign(filter, { status });
+    }
+
+    const populateKeys = ['event', 'items.boothId', 'payments'];
     const list = await this.orderSv.getAllWithPaginationAndFilter(
       pagination,
       filter,
