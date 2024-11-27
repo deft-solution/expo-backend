@@ -1,10 +1,10 @@
 import { Currency } from '../enums/Currency';
 
 export class CurrencyHelper {
-  #KHR_EXCHANGE_RATE: number
+  #KHR_EXCHANGE_RATE: number;
 
   constructor() {
-    this.#KHR_EXCHANGE_RATE = Number(process.env.KHR_EXCHANGE_RATE) || 4096
+    this.#KHR_EXCHANGE_RATE = Number(process.env.KHR_EXCHANGE_RATE) || 4096;
   }
 
   /**
@@ -31,7 +31,6 @@ export class CurrencyHelper {
     // Throw error if conversion is not supported
     throw new Error(`Exchange rate from ${fromCurrency} to ${toCurrency} is not available.`);
   }
-
 
   /**
    * Converts an amount from one currency to another using the stored exchange rates.

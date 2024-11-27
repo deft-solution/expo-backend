@@ -22,8 +22,12 @@ import { EmailService, EmailServiceImpl } from './EmailService';
 import { SerialPrefixService } from './SerialPrefixService';
 
 export interface OrderService extends BaseService<IOrder> {
-  findOneByIdWithPopulate: (id: string) => Promise<IOrder | null>
-  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency) => Promise<{ totalAmount: number; booths: ICalculatedResponse[]; currency: Currency; }>;
+  findOneByIdWithPopulate: (id: string) => Promise<IOrder | null>;
+  calculatedAmountByEvent: (
+    event: string,
+    booths: IOrderBooths[],
+    currency: Currency,
+  ) => Promise<{ totalAmount: number; booths: ICalculatedResponse[]; currency: Currency }>;
   signOrderIsCompleted: (order: IOrder, paymentInfo: AccountTransactionData) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }

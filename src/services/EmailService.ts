@@ -5,13 +5,17 @@ import { Order } from '../models';
 import { OrderService } from './OrderService';
 
 export interface EmailService {
-  sentEmail: <T extends Object>(templateDir: string, recipientMail: string, dataSource: T, subject: string,) => Promise<void>
+  sentEmail: <T extends Object>(
+    templateDir: string,
+    recipientMail: string,
+    dataSource: T,
+    subject: string,
+  ) => Promise<void>;
 }
 
 @injectable()
 export class EmailServiceImpl implements EmailService {
-
-  constructor() { }
+  constructor() {}
 
   sentEmail<T extends Object>(
     templateDir: string,

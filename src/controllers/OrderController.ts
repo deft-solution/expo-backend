@@ -4,13 +4,23 @@ import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-    Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
-    PDFData, POST
+  Authorization,
+  BadRequestError,
+  ContextRequest,
+  Controller,
+  GET,
+  Middleware,
+  NotFoundError,
+  PDFData,
+  POST,
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-    IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
+  IOrderedCalculated,
+  IOrderRequestParams,
+  validateCalculatedParam,
+  validateOrderParam,
 } from '../middlewares/ValidateOrderParam';
 import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
@@ -81,7 +91,7 @@ export class OrderController {
 
     const order = await this.orderSv.findOneByIdWithPopulate(id);
     if (!order) {
-      throw new NotFoundError('This order does not existed', ErrorCode.OrderDoesNotExisted)
+      throw new NotFoundError('This order does not existed', ErrorCode.OrderDoesNotExisted);
     }
 
     return order;
