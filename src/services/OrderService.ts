@@ -22,7 +22,8 @@ import { EmailService, EmailServiceImpl } from './EmailService';
 import { SerialPrefixService } from './SerialPrefixService';
 
 export interface OrderService extends BaseService<IOrder> {
-  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency) => Promise<any>;
+  findOneByIdWithPopulate: (id: string) => Promise<IOrder | null>
+  calculatedAmountByEvent: (event: string, booths: IOrderBooths[], currency: Currency) => Promise<{ totalAmount: number; booths: ICalculatedResponse[]; currency: Currency; }>;
   signOrderIsCompleted: (order: IOrder, paymentInfo: AccountTransactionData) => Promise<void>;
   createOrder: (param: IOrderRequestParams, request: express.Request) => Promise<any>;
 }
@@ -45,6 +46,11 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
 
   constructor() {
     super();
+  }
+
+  async findOneByIdWithPopulate(id: string) {
+    const order = await this.model.findById(id).populate(['event', 'items.boothId', 'payments']);
+    return order;
   }
 
   async signOrderIsCompleted(order: IOrder, paymentInfo: AccountTransactionData) {
