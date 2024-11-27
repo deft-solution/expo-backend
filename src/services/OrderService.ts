@@ -68,7 +68,6 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     const transactionManager = new TransactionManager();
     await transactionManager.runs(async (session) => {
       // Ensure that the session is passed to both update operations
-
       await this.updateAllReserveBooth(order.id, order.items, session);
       await this.findOneByIdAndUpdate(
         order.id,
