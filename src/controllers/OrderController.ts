@@ -1,28 +1,20 @@
 import * as express from 'express';
+import { readFile } from 'fs';
+import fs from 'fs/promises';
 import { inject, injectable } from 'inversify';
 import moment from 'moment-timezone';
 import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization,
-  BadRequestError,
-  ContextRequest,
-  Controller,
-  GET,
-  Middleware,
-  NotFoundError,
-  PDFData,
-  POST,
+  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
+  PDFData, POST
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { formatNumber } from '../helpers/format-number';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated,
-  IOrderRequestParams,
-  validateCalculatedParam,
-  validateOrderParam,
+  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
 } from '../middlewares/ValidateOrderParam';
 import { IEvents } from '../models';
 import { IBoothType } from '../models/BoothType';
@@ -152,7 +144,19 @@ export class OrderController {
     const pdfHelper = new PdfHelper(templatePath);
     const file = await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
 
+<<<<<<< HEAD
     return new PDFData(file, baseFileName);
+=======
+    const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
+    const baseFileName = `${orderNo}-${timestamp}.pdf`;
+
+    // Generate the PDF with a timestamped filename
+    const pdfBuffer = await pdfHelper.generatePDF(data, { format: 'A4' });
+    const fileDir = '/data/invoices/O-00052-20241128075036.pdf';
+    const fileBuffer = await fs.readFile(fileDir);
+
+    return new PDFData(fileBuffer, baseFileName);
+>>>>>>> 040b9b2 (update API PDF)
   }
 
   @POST('/v1/create')
