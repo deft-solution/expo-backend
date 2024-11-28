@@ -111,12 +111,6 @@ export class OrderController {
     if (!order) {
       throw new NotFoundError('This order does not existed.!');
     }
-    const data = {
-      title: `#${order.orderNo}`,
-      message: 'This is a dynamically generated PDF using a Handlebars template.',
-      details: ['Item 1', 'Item 2', 'Item 3'],
-      date: new Date().toLocaleDateString(),
-    };
 
     const event = order.event as IEvents;
     const booths = order.items.map((item) => {
