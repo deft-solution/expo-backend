@@ -118,7 +118,6 @@ export class OrderController {
       date: new Date().toLocaleDateString(),
     };
 
-<<<<<<< HEAD
     const event = order.event as IEvents;
     const booths = order.items.map((item) => {
       const booth = item.boothId as any;
@@ -162,13 +161,6 @@ export class OrderController {
     const file = await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
 
     return new PDFData(file, baseFileName);
-=======
-    const templatePath = path.join('src/templates', 'orders/receipts.html');
-    const pdfHelper = new PdfHelper(templatePath);
-    await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
-
-    return { message: "File Generated Success Fully" };
->>>>>>> e53d177 (Update API PDF)
   }
 
   @POST('/v1/create')
