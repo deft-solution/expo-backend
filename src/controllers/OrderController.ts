@@ -111,7 +111,14 @@ export class OrderController {
     if (!order) {
       throw new NotFoundError('This order does not existed.!');
     }
+    const data = {
+      title: `#${order.orderNo}`,
+      message: 'This is a dynamically generated PDF using a Handlebars template.',
+      details: ['Item 1', 'Item 2', 'Item 3'],
+      date: new Date().toLocaleDateString(),
+    };
 
+<<<<<<< HEAD
     const event = order.event as IEvents;
     const booths = order.items.map((item) => {
       const booth = item.boothId as any;
@@ -155,6 +162,13 @@ export class OrderController {
     const file = await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
 
     return new PDFData(file, baseFileName);
+=======
+    const templatePath = path.join('src/templates', 'orders/receipts.html');
+    const pdfHelper = new PdfHelper(templatePath);
+    await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
+
+    return { message: "File Generated Success Fully" };
+>>>>>>> e53d177 (Update API PDF)
   }
 
   @POST('/v1/create')
