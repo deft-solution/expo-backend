@@ -32,9 +32,6 @@ export class PdfHelper {
 
       // Generate the PDF and ensure it's cast to Buffer
       const pdfBuffer = Buffer.from(await page.pdf(options));
-
-      await browser.close();
-
       return pdfBuffer;
     } catch (error) {
       throw new Error(`${(error as Error).message}`);
