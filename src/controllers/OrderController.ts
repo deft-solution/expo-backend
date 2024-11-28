@@ -103,12 +103,14 @@ export class OrderController {
       details: ['Item 1', 'Item 2', 'Item 3'],
       date: new Date().toLocaleDateString(),
     };
+    const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
+    const baseFileName = `Order-0001-${timestamp}.pdf`;
 
     const templatePath = path.join('src/templates', 'orders/receipts.html');
     const pdfHelper = new PdfHelper(templatePath);
-    await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
+    const file = await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
 
-    return { message: "File Generated Success Fully" };
+    return new PDFData(file, baseFileName);
   }
 
   @POST('/v1/create')
