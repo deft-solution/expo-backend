@@ -27,7 +27,7 @@ export class PdfHelper {
       const htmlContent = template(data);
 
       const browser = await puppeteer.launch({
-        headless: false,
+        headless: 'new' as any,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
       const page = await browser.newPage();
