@@ -1,26 +1,18 @@
 import * as express from 'express';
+import { readFile } from 'fs';
+import fs from 'fs/promises';
 import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization,
-  BadRequestError,
-  ContextRequest,
-  Controller,
-  GET,
-  Middleware,
-  NotFoundError,
-  PDFData,
-  POST,
+  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
+  PDFData, POST
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated,
-  IOrderRequestParams,
-  validateCalculatedParam,
-  validateOrderParam,
+  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
 } from '../middlewares/ValidateOrderParam';
 import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
@@ -97,7 +89,7 @@ export class OrderController {
     return order;
   }
 
-  @GET('/v1/:orderNo/pdf/receipts')
+  @GET('/v1/:orderNo/pdf')
   async getReceiptOrder(@ContextRequest request: express.Request<any, any, IOrderRequestParams>) {
     const { orderNo } = request.params;
 
@@ -121,8 +113,10 @@ export class OrderController {
 
     // Generate the PDF with a timestamped filename
     const pdfBuffer = await pdfHelper.generatePDF(data, { format: 'A4' });
+    const fileDir = '/data/invoices/O-00052-20241128075036.pdf';
+    const fileBuffer = await fs.readFile(fileDir);
 
-    return new PDFData(pdfBuffer, baseFileName);
+    return new PDFData(fileBuffer, baseFileName);
   }
 
   @POST('/v1/create')
