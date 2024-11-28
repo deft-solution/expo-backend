@@ -1,22 +1,32 @@
 import * as express from 'express';
-import { readFile } from 'fs';
-import fs from 'fs/promises';
 import { inject, injectable } from 'inversify';
 import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
-  PDFData, POST
+  Authorization,
+  BadRequestError,
+  ContextRequest,
+  Controller,
+  GET,
+  Middleware,
+  NotFoundError,
+  PDFData,
+  POST,
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
+  IOrderedCalculated,
+  IOrderRequestParams,
+  validateCalculatedParam,
+  validateOrderParam,
 } from '../middlewares/ValidateOrderParam';
 import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
 import { Pagination } from '../utils/Pagination';
+import moment from 'moment';
+import { formatNumber } from '../helpers/format-number';
 
 @Controller('/orders')
 @injectable()
@@ -89,20 +99,37 @@ export class OrderController {
     return order;
   }
 
-  @GET('/v1/:orderNo/pdf')
+  @GET('/v1/:id/pdf')
   async getReceiptOrder(@ContextRequest request: express.Request<any, any, IOrderRequestParams>) {
-    const { orderNo } = request.params;
+    const { id } = request.params;
 
-    const order = await this.orderSv.findOne({ orderNo: orderNo });
+    const order = await this.orderSv.findOneByIdWithPopulate(id);
     if (!order) {
       throw new NotFoundError('This order does not existed.!');
     }
+    const booths = order.items.map((item) => {
+      const booth = item.boothId as any;
+      const boothName = booth.boothName;
+      const boothSize = booth.size;
+
+      return {
+        name: `${boothName} (${boothSize})`,
+        price: `${order.currency} ${formatNumber(item.unitPrice)}`,
+        quantity: item.quantity,
+        totalPrice: formatNumber(item.totalPrice),
+      };
+    });
+
     const data = {
-      title: `#${order.orderNo}`,
-      message: 'This is a dynamically generated PDF using a Handlebars template.',
-      details: ['Item 1', 'Item 2', 'Item 3'],
-      date: new Date().toLocaleDateString(),
+      orderNo: `#${order.orderNo}`,
+      customerName: [order.firstName, order.lastName].join(' '),
+      email: order.email,
+      phoneNumber: order.phoneNumber,
+      issuedDate: moment().format('DD MMM yyyy'),
+      paymentMethod: 'Bakong KHQR',
+      booths,
     };
+
     const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
     const baseFileName = `Order-0001-${timestamp}.pdf`;
 
