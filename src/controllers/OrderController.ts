@@ -97,15 +97,18 @@ export class OrderController {
     if (!order) {
       throw new NotFoundError('This order does not existed.!');
     }
+    const data = {
+      title: `#${order.orderNo}`,
+      message: 'This is a dynamically generated PDF using a Handlebars template.',
+      details: ['Item 1', 'Item 2', 'Item 3'],
+      date: new Date().toLocaleDateString(),
+    };
 
-    const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
-    const baseFileName = `${orderNo}-${timestamp}.pdf`;
+    const templatePath = path.join('src/templates', 'orders/receipts.html');
+    const pdfHelper = new PdfHelper(templatePath);
+    await pdfHelper.generatePDF(data, { format: 'A4', printBackground: true });
 
-    // Generate the PDF with a timestamped filename
-    const fileDir = '/data/invoices/O-00052-20241128075036.pdf';
-    const fileBuffer = await fs.readFile(fileDir);
-
-    return new PDFData(fileBuffer, baseFileName);
+    return { message: "File Generated Success Fully" };
   }
 
   @POST('/v1/create')
