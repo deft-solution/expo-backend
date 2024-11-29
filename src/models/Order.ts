@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 import { Currency } from '../enums/Currency';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '../enums/Order';
+import { IEvents } from './Event';
 
 export interface ICalculatedResponse {
   boothId: string;
@@ -30,7 +31,7 @@ export interface IOrder extends Document {
   status: OrderStatus;
   paymentStatus: PaymentStatus;
   note: string | null;
-  event: mongoose.Types.ObjectId;
+  event: mongoose.Types.ObjectId | IEvents; // Adjust to include both ObjectId and populated type
   items: IOrderItem[];
   //
   completedAt: Date;

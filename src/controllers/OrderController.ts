@@ -1,32 +1,24 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
+import moment from 'moment';
 import { FilterQuery } from 'mongoose';
 import path from 'path';
 
 import {
-  Authorization,
-  BadRequestError,
-  ContextRequest,
-  Controller,
-  GET,
-  Middleware,
-  NotFoundError,
-  PDFData,
-  POST,
+  Authorization, BadRequestError, ContextRequest, Controller, GET, Middleware, NotFoundError,
+  PDFData, POST
 } from '../../packages';
 import { ErrorCode } from '../enums/ErrorCode';
+import { formatNumber } from '../helpers/format-number';
 import { PdfHelper } from '../helpers/PDFHelper';
 import {
-  IOrderedCalculated,
-  IOrderRequestParams,
-  validateCalculatedParam,
-  validateOrderParam,
+  IOrderedCalculated, IOrderRequestParams, validateCalculatedParam, validateOrderParam
 } from '../middlewares/ValidateOrderParam';
+import { IEvents } from '../models';
+import { IBoothType } from '../models/BoothType';
 import { IOrder } from '../models/Order';
 import { EventService, OrderService } from '../services';
 import { Pagination } from '../utils/Pagination';
-import moment from 'moment';
-import { formatNumber } from '../helpers/format-number';
 
 @Controller('/orders')
 @injectable()
@@ -107,15 +99,20 @@ export class OrderController {
     if (!order) {
       throw new NotFoundError('This order does not existed.!');
     }
+
+    const event = order.event as IEvents;
     const booths = order.items.map((item) => {
       const booth = item.boothId as any;
       const boothName = booth.boothName;
       const boothSize = booth.size;
+      const boothType = booth.boothType as IBoothType;
+      const description = boothType.description;
 
       return {
-        name: `${boothName} (${boothSize})`,
+        name: `${boothName} (${boothSize}) (${boothType.name})`,
         price: `${order.currency} ${formatNumber(item.unitPrice)}`,
         quantity: item.quantity,
+        description,
         totalPrice: formatNumber(item.totalPrice),
       };
     });
@@ -125,13 +122,20 @@ export class OrderController {
       customerName: [order.firstName, order.lastName].join(' '),
       email: order.email,
       phoneNumber: order.phoneNumber,
-      issuedDate: moment().format('DD MMM yyyy'),
+      issuedDate: moment().format('DD MMM yyyy hh:mm A'),
       paymentMethod: 'Bakong KHQR',
+      currency: order.currency,
+      totalAmount: formatNumber(order.totalAmount),
       booths,
+      logoUrl: event.logoUrl,
+      eventName: event.name,
+      location: event.location,
+      eventEmail: event.email,
+      eventPhoneNumber: event.phoneNumber,
     };
 
     const timestamp = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0];
-    const baseFileName = `Order-0001-${timestamp}.pdf`;
+    const baseFileName = `Order- 0001 - ${timestamp}.pdf`;
 
     const templatePath = path.join('src/templates', 'orders/receipts.html');
     const pdfHelper = new PdfHelper(templatePath);
