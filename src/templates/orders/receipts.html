@@ -7,153 +7,159 @@
   <title>{{title}}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <style>
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      margin: 20px;
-      height: 100%;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
 
-    ul {
-      margin: 0;
-      padding: 0;
-    }
+    <style>
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        margin: 20px;
+        height: 100%;
+        box-sizing: border-box;
+      }
 
-    .invoice-wrapper {
-      display: flex;
-      background: #f2f5f9;
-      justify-content: space-between;
-      padding: 20px;
-      border-radius: 12px;
-      page-break-after: avoid;
-      /* Avoid page break after the invoice */
-    }
+      ul {
+        margin: 0;
+        padding: 0;
+      }
 
-    .invoice-title {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 700;
-    }
+      .invoice-wrapper {
+        display: flex;
+        background: #f2f5f9;
+        justify-content: space-between;
+        padding: 20px;
+        border-radius: 12px;
+        page-break-after: avoid;
+        /* Avoid page break after the invoice */
+      }
 
-    .customer-name {
-      font-weight: 600;
-      font-size: 14px;
-    }
+      .invoice-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+      }
 
-    .billed-to-txt {
-      color: #60737d;
-      font-weight: 400;
-    }
+      .customer-name {
+        font-weight: 600;
+        font-size: 14px;
+      }
 
-    .address-txt {
-      font-size: 400;
-    }
+      .billed-to-txt {
+        color: #60737d;
+        font-weight: 400;
+      }
 
-    .grid {
-      display: grid;
-    }
+      .address-txt {
+        font-size: 400;
+      }
 
-    .row-gap {
-      row-gap: 10px;
-    }
+      .grid {
+        display: grid;
+      }
 
-    .issued-on-txt {
-      color: #60737d;
-      font-weight: 400;
-    }
+      .row-gap {
+        row-gap: 10px;
+      }
 
-    .flex-column {
-      display: flex;
-      flex-direction: column;
-    }
+      .issued-on-txt {
+        color: #60737d;
+        font-weight: 400;
+      }
 
-    .between {
-      justify-content: space-between;
-    }
+      .flex-column {
+        display: flex;
+        flex-direction: column;
+      }
 
-    .text-right {
-      text-align: right;
-    }
+      .between {
+        justify-content: space-between;
+      }
 
-    .text-center {
-      text-align: center;
-    }
+      .text-right {
+        text-align: right;
+      }
 
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      page-break-inside: avoid;
-      /* Avoid page break inside the table */
-    }
+      .text-center {
+        text-align: center;
+      }
 
-    .booth-name {
-      padding-left: 20px;
-    }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        page-break-inside: avoid;
+        /* Avoid page break inside the table */
+      }
 
-    .mt-40px {
-      margin-top: 40px;
-    }
+      .booth-name {
+        padding-left: 20px;
+      }
 
-    .flex-row {
-      display: flex;
-    }
+      .mt-40px {
+        margin-top: 40px;
+      }
 
-    .total-wrapper {
-      position: relative;
-      /* Required for absolute positioning of pseudo-element */
-      z-index: 12;
-      /* Ensure it is part of the stacking context */
-    }
+      .flex-row {
+        display: flex;
+      }
 
-    .total-wrapper::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 1px;
-      left: 0;
-      top: 50%;
-      /* Line placed at the vertical center of the wrapper */
-      background-color: #d1d5db;
-      /* A subtle grey color for the line */
-      z-index: 10;
-      /* Lower z-index so it appears below the content */
-    }
+      .total-wrapper {
+        position: relative;
+        /* Required for absolute positioning of pseudo-element */
+        z-index: 12;
+        /* Ensure it is part of the stacking context */
+      }
 
-    .total-content {
-      background-color: #f2f5f9;
-      border-radius: 12px;
-      padding: 20px;
-      margin-left: auto;
-      width: max-content;
-      margin-top: 20px;
-      position: relative;
-      /* Ensures it's positioned above the line */
-      z-index: 15;
-      /* Higher z-index to render above the line */
-    }
+      .total-wrapper::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        left: 0;
+        top: 50%;
+        /* Line placed at the vertical center of the wrapper */
+        background-color: #d1d5db;
+        /* A subtle grey color for the line */
+        z-index: 10;
+        /* Lower z-index so it appears below the content */
+      }
 
-    .event-name {
-      font-size: 14px;
-      font-weight: 800;
-    }
+      .total-content {
+        background-color: #f2f5f9;
+        border-radius: 12px;
+        padding: 20px;
+        margin-left: auto;
+        width: max-content;
+        margin-top: 20px;
+        position: relative;
+        /* Ensures it's positioned above the line */
+        z-index: 15;
+        /* Higher z-index to render above the line */
+      }
 
-    .footer-wrapper {
-      width: 100%;
-      page-break-inside: avoid;
-      /* Avoid page break inside the table */
-      padding-top: 20px;
-      margin-top: auto;
-    }
+      .event-name {
+        font-size: 14px;
+        font-weight: 800;
+      }
 
-    /* Reduce margins and padding for printing */
-    .grid,
-    .row-gap {
-      row-gap: 5px;
-      /* Less gap for print */
-    }
-  </style>
-</head>
+      .footer-wrapper {
+        width: 100%;
+        page-break-inside: avoid;
+        /* Avoid page break inside the table */
+        padding-top: 20px;
+        margin-top: auto;
+      }
+
+      /* Reduce margins and padding for printing */
+      .grid,
+      .row-gap {
+        row-gap: 5px;
+        /* Less gap for print */
+      }
+    </style>
+  </head>
 
 <body>
   <div>
