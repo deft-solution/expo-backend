@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
 import { sumBy } from 'lodash';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import mongoose, { ObjectId } from 'mongoose';
 import { AccountTransactionData } from 'src/models/SitAPI';
 
@@ -15,7 +15,6 @@ import { CurrencyHelper } from '../helpers/CurrencyConverter';
 import { ExpressHelper } from '../helpers/Express';
 import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
 import { ICalculatedResponse, IOrder, IOrderItem, Order } from '../models';
-import { IBooth } from '../models/Booth';
 import { BoothService } from './BoothService';
 import { BoothTypeService } from './BoothTypeService';
 import { EmailService, EmailServiceImpl } from './EmailService';
@@ -244,7 +243,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
     if (!order) {
       return;
     }
-
+    const timezone = process.env.TIMEZONE ?? 'Asia/Phnom_Penh';
     const booths = order.items.map((item) => {
       const booth = item.boothId as any;
       const boothName = booth.boothName;
@@ -263,7 +262,7 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
       customerName,
       totalAmount: `${order.currency} ${order.totalAmount}`,
       year: new Date().getFullYear(),
-      paymentTime: moment(paymentInfo.acknowledgedDateMs).format('DD MMM yyyy hh:mm A'),
+      paymentTime: moment(paymentInfo.acknowledgedDateMs).tz(timezone).format('DD MMM yyyy hh:mm A'),
       booths,
     };
 

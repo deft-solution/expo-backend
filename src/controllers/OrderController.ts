@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { FilterQuery } from 'mongoose';
 import path from 'path';
 
@@ -116,13 +116,14 @@ export class OrderController {
         totalPrice: formatNumber(item.totalPrice),
       };
     });
+    const timezone = process.env.TIMEZONE ?? 'Asia/Phnom_Penh';
 
     const data = {
       orderNo: `#${order.orderNo}`,
       customerName: [order.firstName, order.lastName].join(' '),
       email: order.email,
       phoneNumber: order.phoneNumber,
-      issuedDate: moment().format('DD MMM yyyy hh:mm A'),
+      issuedDate: moment().tz(timezone).format('DD MMM yyyy hh:mm A'),
       paymentMethod: 'Bakong KHQR',
       currency: order.currency,
       totalAmount: formatNumber(order.totalAmount),
