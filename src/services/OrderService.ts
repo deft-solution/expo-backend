@@ -52,15 +52,14 @@ export class OrderServiceImpl extends BaseServiceImpl<IOrder> implements OrderSe
   }
 
   async findOneByIdWithPopulate(id: string) {
-    const order = await this.model.findById(id)
-      .populate([
-        { path: 'event' }, // Populate event details
-        {
-          path: 'items.boothId', // Populate booth details for each item
-          populate: { path: 'boothType' }, // Further populate boothType inside boothId
-        },
-        { path: 'payments' }, // Populate payment details
-      ]);
+    const order = await this.model.findById(id).populate([
+      { path: 'event' }, // Populate event details
+      {
+        path: 'items.boothId', // Populate booth details for each item
+        populate: { path: 'boothType' }, // Further populate boothType inside boothId
+      },
+      { path: 'payments' }, // Populate payment details
+    ]);
     return order;
   }
 
