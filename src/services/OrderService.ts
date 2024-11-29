@@ -15,7 +15,6 @@ import { CurrencyHelper } from '../helpers/CurrencyConverter';
 import { ExpressHelper } from '../helpers/Express';
 import { IOrderBooths, IOrderRequestParams } from '../middlewares/ValidateOrderParam';
 import { ICalculatedResponse, IOrder, IOrderItem, Order } from '../models';
-import { IBooth } from '../models/Booth';
 import { BoothService } from './BoothService';
 import { BoothTypeService } from './BoothTypeService';
 import { EmailService, EmailServiceImpl } from './EmailService';
