@@ -1,11 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { Currency } from '../enums/Currency';
 
 export interface BoothTemplateExcel {
   'Booth Number': string;
   'Booth Name': string;
   'Event Name': string;
   'Booth Type': string;
-  'External ID': string;
+  Currency: Currency;
   Hall: string;
   Size: string;
   Price: number;
@@ -19,7 +20,6 @@ export interface IBooth extends Document {
   size: string;
   event: mongoose.Types.ObjectId;
   mapUrl: string | null;
-  externalId: string;
   isReserved: boolean;
   price: number;
   isActive?: boolean;
@@ -35,7 +35,6 @@ export const BoothSchema: Schema = new Schema(
     hall: { type: String, required: true, default: null },
     size: { type: String, required: false, default: null },
     mapUrl: { type: String, required: false, default: null },
-    externalId: { type: String, required: true },
     price: { type: Number, required: false, default: null },
     isReserved: { type: Boolean, required: false, default: false },
     isActive: { type: Boolean, default: true },

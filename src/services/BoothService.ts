@@ -114,6 +114,7 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
           const boothTypeData: Partial<IBoothType> = {
             name: booth['Booth Type'],
             price: booth.Price,
+            currency: booth.Currency,
             createdBy: userId as any,
             description: booth.Description,
           };
@@ -130,7 +131,6 @@ export class BoothServiceImpl extends BaseServiceImpl<IBooth> implements BoothSe
             price: booth.Price,
             size: booth.Size,
             mapUrl: null,
-            externalId: booth['External ID'],
           };
           const boothResponse = await this.create(boothData, { session });
 

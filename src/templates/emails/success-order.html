@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 15px 0;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .order-summary {
+      margin: 20px 0;
+    }
+
+    .order-summary table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .order-summary th,
+    .order-summary td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .order-summary th {
+      background-color: #f8f8f8;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .button {
+      display: inline-block;
+      margin: 20px 0;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Order Confirmation {{orderNo}}</h1>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <p>Hi {{customerName}},</p>
+      <p>
+        Thank you for your purchase! Your order has been successfully placed. Below are the details of your order:
+      </p>
+      <!-- Payment Timestamp -->
+      <p><strong>Payment Time:</strong> {{paymentTime}}</p>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#if booths}} {{#each booths}}
+            <tr>
+              <td>{{this.name}}</td>
+              <td>{{this.quantity}}</td>
+              <td>{{this.price}}</td>
+            </tr>
+            {{/each}} {{else}}
+            <tr>
+              <td colspan="3">No items found in the order.</td>
+            </tr>
+            {{/if}}
+            <tr>
+              <td colspan="2"><strong>Total</strong></td>
+              <td><strong>{{totalAmount}}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Call-to-Action -->
+      <p>You can view your order details or track your shipment by clicking the button below:</p>
+      <p>If you have any questions, feel free to contact our support team.</p>
+
+      <p>Thank you for choosing Cambodia Trade Expo!</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>&copy; {{year}} Cambodia Trade Expo. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+
+</html>

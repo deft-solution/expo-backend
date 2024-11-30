@@ -102,17 +102,16 @@ export class ServerContainer {
     }
 
     if (value instanceof PDFData) {
-      // Assuming value.data is a Buffer, if it's not, Buffer.from can be used.
-      const buffer = value.data instanceof Buffer ? value.data : Buffer.from(value.data, 'binary');
-
+      const content = value.data;
       const fileName = value.fileName;
+
       response.writeHead(200, {
-        "Content-Length": buffer.length,
+        "Content-Length": content.length,
         "Content-Type": "application/pdf",
         'Content-disposition': `attachment;filename="${fileName}"`
       });
 
-      response.end(buffer);
+      response.end(content);
       return;
     }
 

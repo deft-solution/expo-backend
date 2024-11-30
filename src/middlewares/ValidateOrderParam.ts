@@ -1,29 +1,65 @@
 import * as express from 'express';
+
+import { MAX_QUANTITY } from '../contants/Order';
+import { Currency } from '../enums/Currency';
+import { PaymentMethod } from '../enums/Payment';
 import { GenericParamsChecker, ValidationRulesMap } from '../helpers/ValidationParamHelper';
-import { MAX_PER_ORDER, MAX_QUANTITY } from '../contants/Order';
 
 // Define the interface
+export interface IOrderedCalculated {
+  event: string;
+  currency: Currency;
+  booths: IOrderBooths[];
+}
+
 export interface IOrderRequestParams {
-  event: string; // Machine is represented as an ObjectId in string format
+  currency: Currency;
+  event: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  provider: number;
-  paymentCard: string;
-  option: string;
-  userId: string;
-  email: string;
   companyName: string | null;
-  patentUrl: string | null;
   nationality: string | null;
+  patentUrl: string | null;
+  paymentMethod: PaymentMethod;
+  email: string;
   note: string | null;
   booths: IOrderBooths[];
-  paymentId: string;
 }
 
 export interface IOrderBooths {
   quantity: number;
   boothId: string;
+}
+
+export function validateCalculatedParam(
+  req: express.Request<any, any, IOrderedCalculated>,
+  _R: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    const rules: ValidationRulesMap<IOrderedCalculated> = {
+      currency: { isRequired: true, type: 'string', enumValues: Object.values(Currency) },
+      event: { isRequired: true, isObjectId: true, type: 'string' },
+      booths: {
+        isArray: true,
+        minLength: 1,
+        itemRules: {
+          boothId: { isRequired: true, isObjectId: true, type: 'string' },
+          quantity: {
+            isRequired: true,
+            type: 'number',
+            isPositiveInteger: true,
+            maxQuantity: MAX_QUANTITY,
+          },
+        },
+      },
+    };
+    new GenericParamsChecker(req, rules);
+    next();
+  } catch (error) {
+    next(error);
+  }
 }
 
 export function validateOrderParam(
@@ -33,24 +69,20 @@ export function validateOrderParam(
 ) {
   try {
     const rules: ValidationRulesMap<IOrderRequestParams> = {
+      currency: { isRequired: true, type: 'string', enumValues: Object.values(Currency) },
       event: { isRequired: true, isObjectId: true, type: 'string' },
       firstName: { isRequired: true, type: 'string' },
       lastName: { isRequired: true, type: 'string' },
       phoneNumber: { isRequired: true, type: 'string' },
-      paymentId: { isRequired: true, type: 'string' },
-      userId: { isRequired: true, type: 'string' },
       email: { isRequired: true, type: 'string' },
-      provider: { isRequired: true, type: 'number' },
-      option: { isRequired: true, type: 'string' },
-      paymentCard: { isRequired: true, type: 'string' },
       companyName: { isRequired: false, type: 'string' },
       patentUrl: { isRequired: false, type: 'string', allowNull: true },
       nationality: { isRequired: false, type: 'string' },
+      paymentMethod: { isRequired: true, type: 'number', enumValues: Object.values(PaymentMethod) },
       note: { isRequired: false, type: 'string' },
       booths: {
         isArray: true,
         minLength: 1,
-        maxLength: MAX_PER_ORDER,
         itemRules: {
           boothId: { isRequired: true, isObjectId: true, type: 'string' },
           quantity: {

@@ -26,15 +26,15 @@ export class PdfHelper {
       const template = await this.loadTemplate();
       const htmlContent = template(data);
 
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({
+        headless: 'new' as any,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
       // Generate the PDF and ensure it's cast to Buffer
       const pdfBuffer = Buffer.from(await page.pdf(options));
-
-      await browser.close();
-
       return pdfBuffer;
     } catch (error) {
       throw new Error(`${(error as Error).message}`);

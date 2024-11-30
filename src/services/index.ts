@@ -1,14 +1,18 @@
 import { REST } from '../../packages';
 import { BabyService, BabyServiceImpl } from './BabyService';
+import { BakongService, BakongServiceImpl } from './BakongTokenService';
 import { BoothService, BoothServiceImpl } from './BoothService';
 import { BoothTypeService, BoothTypeServiceImpl } from './BoothTypeService';
+import { EmailService, EmailServiceImpl } from './EmailService';
 import { EventService, EventServiceImpl } from './EventService';
 import { ExhibitionService, ExhibitionServiceImpl } from './ExhibitionService';
+import { OrderService, OrderServiceImpl } from './OrderService';
+import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
+import { SitAPIService, SitAPIServiceImpl } from './SitAPIService';
 import { SocialLinkService, SocialLinkServiceImpl } from './SocialLinkService';
+import { TransactionService, TransactionServiceImpl } from './TransactionService';
 import { UserService, UserServiceImpl } from './UserService';
 import { VerificationService, VerificationServiceImpl } from './VerificationSerivce';
-import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
-import { OrderServiceImpl, OrderService } from './OrderService';
 
 REST.register('BabyService', BabyServiceImpl);
 REST.register('UserService', UserServiceImpl);
@@ -20,6 +24,10 @@ REST.register('BoothTypeService', BoothTypeServiceImpl);
 REST.register('BoothService', BoothServiceImpl);
 REST.register('SerialPrefixService', SerialPrefixServiceImpl);
 REST.register('OrderService', OrderServiceImpl);
+REST.register('SitAPIService', SitAPIServiceImpl);
+REST.register('BakongService', BakongServiceImpl);
+REST.register('TransactionService', TransactionServiceImpl);
+REST.register('EmailService', EmailServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -42,4 +50,12 @@ export {
   SerialPrefixServiceImpl,
   OrderService,
   OrderServiceImpl,
+  SitAPIService,
+  SitAPIServiceImpl,
+  BakongService,
+  BakongServiceImpl,
+  TransactionService,
+  TransactionServiceImpl,
+  EmailService,
+  EmailServiceImpl,
 };
