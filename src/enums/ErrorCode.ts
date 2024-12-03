@@ -26,4 +26,5 @@ export enum ErrorCode {
   OrderedBoothHasAlreadyReserved = 60004,
   TransactionHaveNotCompletedYet = 60005,
   TransactionAlreadyCompleted = 60006,
+  MerchantPaymentDoesNotExisted = 60007,
 }

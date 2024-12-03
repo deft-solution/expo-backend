@@ -6,13 +6,14 @@ import { BoothTypeService, BoothTypeServiceImpl } from './BoothTypeService';
 import { EmailService, EmailServiceImpl } from './EmailService';
 import { EventService, EventServiceImpl } from './EventService';
 import { ExhibitionService, ExhibitionServiceImpl } from './ExhibitionService';
+import { MerchantPaymentService, MerchantPaymentServiceImpl } from './MerchantsPaymentService';
 import { OrderService, OrderServiceImpl } from './OrderService';
 import { SerialPrefixService, SerialPrefixServiceImpl } from './SerialPrefixService';
 import { SitAPIService, SitAPIServiceImpl } from './SitAPIService';
 import { SocialLinkService, SocialLinkServiceImpl } from './SocialLinkService';
 import { TransactionService, TransactionServiceImpl } from './TransactionService';
 import { UserService, UserServiceImpl } from './UserService';
-import { VerificationService, VerificationServiceImpl } from './VerificationSerivce';
+import { VerificationService, VerificationServiceImpl } from './VerificationService';
 
 REST.register('BabyService', BabyServiceImpl);
 REST.register('UserService', UserServiceImpl);
@@ -28,6 +29,7 @@ REST.register('SitAPIService', SitAPIServiceImpl);
 REST.register('BakongService', BakongServiceImpl);
 REST.register('TransactionService', TransactionServiceImpl);
 REST.register('EmailService', EmailServiceImpl);
+REST.register('MerchantPaymentService', MerchantPaymentServiceImpl);
 
 export {
   BabyServiceImpl,
@@ -58,4 +60,6 @@ export {
   TransactionServiceImpl,
   EmailService,
   EmailServiceImpl,
+  MerchantPaymentService,
+  MerchantPaymentServiceImpl,
 };

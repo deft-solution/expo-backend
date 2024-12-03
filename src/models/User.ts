@@ -10,8 +10,8 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt: Date;
-  hasVerify: Boolean;
-  isExhibitor: Boolean;
+  hasVerify: boolean;
+  isExhibitor: boolean;
   //
   profile: UserProfile;
 }

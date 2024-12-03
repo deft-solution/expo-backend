@@ -16,6 +16,7 @@ export interface IEvents extends Document {
   createdBy: PopulatedDoc<IUser>;
   createdAt: Date;
   isActive: boolean;
+  isUsingWonderPassPayment: boolean;
   maxBoothPerOrder: number; // Updated field name
 }
 
@@ -64,6 +65,10 @@ const EventSchema: Schema<IEvents> = new Schema<IEvents>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isUsingWonderPassPayment: {
+      type: Boolean,
+      default: false,
     },
     createdAt: {
       type: Date,
